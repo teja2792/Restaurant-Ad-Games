@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFB61E">
+<title>What’s your Bagara? | Bagara Biryani Cafe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one phone-width column; every screen is a full-bleed colour poster, one question per screen, doodles drawn with a wobbling hand-drawn line. */
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+:root {
+  --saffron: #FFB61E;
+  --chilli: #C8281A;
+  --leaf: #0B7A50;
+  --indigo: #3A2FA8;
+  --ink: #1E1410;
+  --paper: #FFF3DC;
+  --pink: #FF6FAE;
+  --turq: #00A7A0;
+  --rice: #F7E9C6;
+  --brass: #D9A441;
+  --display: "Shrikhand", "Georgia", serif;
+  --body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  --fg: var(--ink);
+  --bg: var(--saffron);
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.4;
+
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body.ready { transition: background-color .35s ease; }
+body[data-screen="welcome"] { --bg: var(--saffron); --fg: var(--ink); }
+body[data-screen="q1"] { --bg: var(--chilli); --fg: var(--paper); }
+body[data-screen="q2"] { --bg: var(--leaf); --fg: var(--paper); }
+body[data-screen="q3"] { --bg: var(--indigo); --fg: var(--paper); }
+body[data-screen="seal"] { --bg: var(--ink); --fg: var(--paper); }
+body[data-screen="form"] { --bg: var(--paper); --fg: var(--ink); }
+body[data-screen="card"] { --bg: var(--ink); --fg: var(--paper); }
+
+#app { max-width: 460px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; padding-block: 14px 28px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; }
+.brand { font-family: var(--mono); font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.brand small { display: block; font-weight: 500; letter-spacing: .1em; opacity: .8; }
+.tester { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; padding: 4px 8px; border: 1.5px solid currentColor; border-radius: 999px; white-space: nowrap; }
+.mini-pot { width: 52px; height: 44px; }
+
+.screen { flex: 1; display: flex; flex-direction: column; gap: 16px; padding-top: 10px; }
+.eyebrow { font-family: var(--mono); font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: .005em; }
+h1 { font-size: clamp(44px, 13vw, 60px); line-height: .98; }
+h2 { font-size: clamp(30px, 8.6vw, 38px); line-height: 1.04; }
+p { margin: 0; }
+.lede { font-size: 18px; max-width: 34ch; }
+.hint { font-size: 15px; opacity: .88; }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 58px; padding: 0 22px; border-radius: 16px;
+  font-family: var(--body); font-weight: 800; font-size: 18px; letter-spacing: .01em;
+  background: var(--fg); color: var(--bg); border: 3px solid var(--fg);
+  box-shadow: 5px 5px 0 rgba(0,0,0,.28);
+  cursor: pointer; text-decoration: none; transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 rgba(0,0,0,.28); }
+.btn[disabled] { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: none; }
+.link { background: none; border: none; color: inherit; font: inherit; font-size: 15px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; min-height: 44px; padding: 0; }
+:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+.push { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+
+.doodle { filter: url(#wob); }
+svg .stroke { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Welcome */
+.hero-pot { position: relative; display: flex; justify-content: center; padding: 6px 0 0; }
+.hero-pot svg { width: min(78%, 300px); height: auto; }
+.stickers { position: absolute; inset: 0; pointer-events: none; }
+.sticker { position: absolute; font-family: var(--mono); font-weight: 600; font-size: 12px; letter-spacing: .08em; padding: 6px 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); color: var(--ink); }
+.lid-hop { animation: hop 1.6s ease-in-out infinite; transform-origin: 150px 104px; }
+@keyframes hop { 0%,70%,100% { transform: translateY(0) rotate(0); } 78% { transform: translateY(-14px) rotate(-4deg); } 86% { transform: translateY(0) rotate(0); } 92% { transform: translateY(-6px) rotate(3deg); } }
+.meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .08em; padding: 6px 10px; border-radius: 999px; border: 2px solid currentColor; }
+
+/* Q1 sound cards */
+.sounds { display: flex; flex-direction: column; gap: 12px; }
+.sound {
+  display: grid; grid-template-columns: 84px minmax(0,1fr); align-items: center; gap: 14px;
+  text-align: left; padding: 12px 16px 12px 10px; min-height: 104px; border-radius: 20px;
+  background: var(--paper); color: var(--ink); border: 3px solid var(--paper); cursor: pointer; font: inherit;
+  box-shadow: 5px 5px 0 rgba(0,0,0,.22); transition: transform .12s ease;
+}
+.sound:nth-child(2) { transform: rotate(.8deg); }
+.sound:nth-child(3) { transform: rotate(-.7deg); }
+.sound svg { width: 84px; height: 84px; color: var(--ink); }
+.sound b { display: block; font-family: var(--display); font-weight: 400; font-size: 23px; line-height: 1.05; }
+.sound span { font-size: 15px; }
+.sound .play { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; font-weight: 600; color: var(--ink); display: flex; gap: 6px; margin-top: 6px; align-items: center; text-decoration: underline; text-underline-offset: 3px; }
+.sound[aria-pressed="true"] { background: var(--saffron); border-color: var(--ink); }
+.sound.playing svg { animation: jiggle .11s steps(2) infinite; }
+@keyframes jiggle { 0% { transform: translate(0,0) rotate(0); } 100% { transform: translate(1.5px,-1.5px) rotate(2deg); } }
+
+/* Q2 plate */
+.plate-zone { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 4px; touch-action: none; }
+.move {
+  min-height: 184px; padding: 14px; border-radius: 22px; border: 3px solid var(--paper);
+  background: transparent; color: var(--paper); font: inherit; font-weight: 600; font-size: 16px; line-height: 1.25;
+  display: flex; flex-direction: column; cursor: pointer; gap: 8px; transition: background-color .2s ease, color .2s ease;
+}
+.move .fork { width: 28px; height: 28px; flex-shrink: 0; }
+.move.tl { align-items: flex-start; text-align: left; justify-content: flex-start; }
+.move.tr { align-items: flex-end; text-align: right; justify-content: flex-start; }
+.move.bl { align-items: flex-start; text-align: left; justify-content: flex-end; }
+.move.br { align-items: flex-end; text-align: right; justify-content: flex-end; }
+.move.hot { background: rgba(255,243,220,.16); }
+.move[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.plate { position: absolute; left: 50%; top: 50%; width: 118px; height: 118px; margin: -59px 0 0 -59px; pointer-events: none; }
+.plate svg { width: 100%; height: 100%; }
+.piece { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; pointer-events: auto; cursor: grab; touch-action: none; transition: transform .35s cubic-bezier(.3,1.4,.5,1); z-index: 2; }
+.piece.dragging { transition: none; cursor: grabbing; }
+.piece svg { width: 100%; height: 100%; }
+
+/* Q3 stickers */
+.bites { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.bite {
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 12px;
+  min-height: 150px; padding: 14px; border-radius: 20px; border: 3px solid var(--ink);
+  font: inherit; text-align: left; cursor: pointer; color: var(--ink);
+  box-shadow: 5px 5px 0 rgba(0,0,0,.3); transition: transform .15s ease;
+}
+.bite:nth-child(1) { background: var(--saffron); transform: rotate(-2deg); }
+.bite:nth-child(2) { background: var(--pink); transform: rotate(1.5deg); }
+.bite:nth-child(3) { background: var(--turq); transform: rotate(1deg); }
+.bite:nth-child(4) { background: var(--paper); transform: rotate(-1.5deg); }
+.bite svg { width: 40px; height: 40px; color: var(--ink); }
+.bite b { font-family: var(--display); font-weight: 400; font-size: 21px; line-height: 1.08; }
+.bite[aria-pressed="true"] { outline: 4px solid var(--paper); outline-offset: 3px; transform: rotate(0) scale(1.02); }
+
+/* Seal */
+.seal-stage { position: relative; display: flex; justify-content: center; align-items: flex-end; min-height: 330px; }
+.seal-stage svg.pot { width: min(86%, 320px); height: auto; color: var(--paper); }
+#sealLid { transition: transform .5s cubic-bezier(.5,0,.3,1.4); transform-origin: 150px 104px; }
+#sealLid.down { transform: translateY(0); }
+#sealLid.up { transform: translate(90px,-120px) rotate(24deg); transition: transform .7s cubic-bezier(.2,1,.3,1); }
+#sealRing { stroke-dasharray: 520; stroke-dashoffset: 520; transition: stroke-dashoffset 2.6s linear; }
+#sealRing.on { stroke-dashoffset: 0; }
+.count { position: absolute; top: 26px; left: 0; right: 0; text-align: center; font-family: var(--display); font-size: 84px; line-height: 1; color: var(--saffron); text-shadow: 4px 4px 0 var(--chilli); pointer-events: none; }
+.face { position: absolute; top: 0; left: 50%; width: 160px; height: 160px; margin-left: -80px; border-radius: 50%; overflow: hidden; background: #2A2420; border: 4px solid var(--paper); opacity: 0; transform: translateY(60px) scale(.6); transition: opacity .6s ease, transform .8s cubic-bezier(.2,1.3,.4,1); z-index: 3; }
+.face.show { opacity: 1; transform: translateY(0) scale(1); }
+.face video, .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.face video { transform: scaleX(-1); }
+.flash { position: fixed; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 20; }
+.flash.on { opacity: .9; transition: none; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+label.btn:focus-within { outline: 3px solid var(--pink); outline-offset: 3px; }
+.note { font-size: 13px; opacity: .8; }
+
+/* Form */
+.preview { position: relative; border-radius: 10px; overflow: hidden; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); max-height: 260px; }
+.preview img { display: block; width: 100%; }
+.preview::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(255,243,220,0), var(--paper) 70%); }
+.preview-tag { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .1em; z-index: 1; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 600; font-size: 15px; }
+.field input { min-height: 54px; border-radius: 14px; border: 3px solid var(--ink); background: #FFFFFF; color: var(--ink); font: inherit; font-size: 18px; padding: 0 14px; }
+.phone-row { display: flex; align-items: stretch; gap: 8px; }
+.phone-row span { display: flex; align-items: center; padding: 0 12px; border-radius: 14px; border: 3px solid var(--ink); font-family: var(--mono); font-weight: 600; }
+.phone-row input { flex: 1; min-width: 0; }
+.check { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; min-height: 44px; }
+.check input { width: 24px; height: 24px; margin: 0; flex-shrink: 0; accent-color: var(--chilli); }
+.banner { font-family: var(--mono); font-size: 12px; line-height: 1.5; padding: 10px 12px; border-radius: 12px; background: var(--ink); color: var(--paper); }
+.err { color: var(--chilli); font-weight: 600; font-size: 14px; min-height: 20px; }
+
+/* Card */
+.card-wrap { border-radius: 6px; overflow: hidden; box-shadow: 7px 7px 0 var(--saffron); }
+.card-wrap img { display: block; width: 100%; height: auto; }
+.row { display: flex; gap: 10px; }
+.row .btn { flex: 1; }
+.btn.alt { background: var(--saffron); color: var(--ink); border-color: var(--saffron); }
+.sealed { border-radius: 20px; background: var(--paper); color: var(--ink); padding: 18px; display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 14px; align-items: center; }
+.sealed svg { width: 56px; height: 56px; }
+.sealed b { font-family: var(--display); font-weight: 400; font-size: 20px; line-height: 1.1; display: block; }
+.sealed .teaser { font-size: 15px; margin-top: 4px; }
+.diary { display: flex; flex-direction: column; gap: 10px; }
+.diary-row { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+.diary-row div { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; }
+.diary-row svg { width: 100%; max-width: 60px; height: auto; color: var(--paper); }
+.toast { font-family: var(--mono); font-size: 12px; min-height: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="wob"><feTurbulence id="wobNoise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="2"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="3.4"></feDisplacementMap></filter>
+</svg>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Bagara Biryani Cafe<small id="stepLabel">What’s your Bagara?</small></div>
+    <svg class="mini-pot" id="miniPot" viewBox="0 0 300 260" role="img" aria-label="Your biryani so far"></svg>
+    <span class="tester">TEST VERSION</span>
+  </header>
+
+  <!-- Welcome -->
+  <section class="screen" id="s-welcome">
+    <div class="hero-pot">
+      <svg viewBox="0 0 300 300" aria-hidden="true" class="doodle" style="color: var(--ink)">
+        <path class="stroke" d="M112 58c-10-14 10-20 0-34M150 48c-10-14 10-20 0-34M188 58c-10-14 10-20 0-34"></path>
+        <g class="lid-hop">
+          <path d="M60 104C62 70 104 50 150 50S238 70 240 104Z" fill="var(--chilli)"></path>
+          <path class="stroke" d="M60 104C62 70 104 50 150 50S238 70 240 104Z"></path>
+          <rect x="132" y="34" width="36" height="18" rx="8" fill="var(--chilli)" class="stroke"></rect>
+          <path class="stroke" d="M96 86c18-10 36-14 54-14" stroke-width="2.4"></path>
+        </g>
+        <rect x="30" y="104" width="240" height="22" rx="11" fill="var(--paper)" class="stroke"></rect>
+        <path d="M42 126C42 232 98 284 150 284S258 232 258 126Z" fill="var(--paper)"></path>
+        <path class="stroke" d="M42 126C42 232 98 284 150 284S258 232 258 126"></path>
+        <path class="stroke" d="M70 170c40 16 120 16 160 0M80 214c34 12 106 12 140 0" stroke-width="2.4"></path>
+      </svg>
+      <div class="stickers">
+        <span class="sticker" style="left:0; top:18%; transform:rotate(-8deg)">3 QUESTIONS</span>
+        <span class="sticker" style="right:0; top:38%; transform:rotate(6deg); background: var(--pink)">1 SELFIE</span>
+        <span class="sticker" style="left:4%; bottom:8%; transform:rotate(4deg); background: var(--turq)">ABOUT 1 MIN</span>
+      </div>
+    </div>
+    <h1>What’s your Bagara?</h1>
+    <p class="lede">Answer three questions while the bill comes. Your answers cook a biryani. Your selfie seals the dum.</p>
+    <div class="push">
+      <button class="btn" type="button" id="startBtn">Start cooking</button>
+      <p class="note">The selfie is optional. You can skip it.</p>
+    </div>
+  </section>
+
+  <!-- Q1 -->
+  <section class="screen" id="s-q1" hidden>
+    <span class="eyebrow">Layer 1 of 3 · Rice</span>
+    <h2>What does your day sound like?</h2>
+    <p class="hint">Tap to hear it. Pick the one that’s you.</p>
+    <div class="sounds" role="group" aria-label="Sounds">
+      <button class="sound" type="button" data-mood="whistle" aria-pressed="false">
+        <svg viewBox="0 0 90 90" aria-hidden="true" class="doodle">
+          <path class="stroke" d="M45 6v8M30 10l4 7M60 10l-4 7"></path>
+          <rect x="38" y="16" width="14" height="12" rx="3" fill="var(--chilli)" class="stroke"></rect>
+          <path d="M18 34h54v34c0 8-6 14-14 14H32c-8 0-14-6-14-14z" fill="var(--saffron)"></path>
+          <path class="stroke" d="M18 34h54v34c0 8-6 14-14 14H32c-8 0-14-6-14-14zM14 34h62M72 42h14"></path>
+        </svg>
+        <span><b>Pressure-cooker whistle</b><span>Five things due. About to blow.</span><span class="play" aria-hidden="true">TAP TO HEAR</span></span>
+      </button>
+      <button class="sound" type="button" data-mood="sizzle" aria-pressed="false">
+        <svg viewBox="0 0 90 90" aria-hidden="true" class="doodle">
+          <path class="stroke" d="M30 22l-4-10M45 18V6M60 22l4-10M22 34l-8-4M68 34l8-4"></path>
+          <circle cx="38" cy="30" r="2.5" fill="currentColor"></circle><circle cx="54" cy="28" r="2.5" fill="currentColor"></circle>
+          <path d="M10 46h70c0 18-14 30-35 30S10 64 10 46z" fill="var(--chilli)"></path>
+          <path class="stroke" d="M10 46h70c0 18-14 30-35 30S10 64 10 46zM4 46h8M78 46h8"></path>
+        </svg>
+        <span><b>Tadka sizzling</b><span>Buzzing, loud, ready for more.</span><span class="play" aria-hidden="true">TAP TO HEAR</span></span>
+      </button>
+      <button class="sound" type="button" data-mood="simmer" aria-pressed="false">
+        <svg viewBox="0 0 90 90" aria-hidden="true" class="doodle">
+          <circle class="stroke" cx="34" cy="18" r="5"></circle><circle class="stroke" cx="52" cy="12" r="3.5"></circle><circle class="stroke" cx="60" cy="26" r="4"></circle>
+          <path d="M14 40h62v20c0 12-12 22-31 22S14 72 14 60z" fill="var(--turq)"></path>
+          <path class="stroke" d="M14 40h62v20c0 12-12 22-31 22S14 72 14 60zM10 40h70"></path>
+        </svg>
+        <span><b>Rice slowly simmering</b><span>No rush. Lid on. Peace.</span><span class="play" aria-hidden="true">TAP TO HEAR</span></span>
+      </button>
+    </div>
+    <div class="push">
+      <button class="btn" type="button" id="q1Next" disabled>Pour the rice</button>
+    </div>
+  </section>
+
+  <!-- Q2 -->
+  <section class="screen" id="s-q2" hidden>
+    <span class="eyebrow">Layer 2 of 3 · Masala</span>
+    <h2>One last piece on the plate. Everyone is staring. You…</h2>
+    <p class="hint">Drag the piece to your move, or tap one.</p>
+    <div class="plate-zone" id="plateZone">
+      <button class="move tl" type="button" data-persona="offer" aria-pressed="false">
+        <span>Offer it to everyone… then eat it anyway</span>
+        <svg class="fork doodle" viewBox="0 0 40 40" aria-hidden="true"><path class="stroke" d="M8 8l18 18M14 4l-2 8M20 6l-4 6M6 14l8-2M26 26l8 8"></path></svg>
+      </button>
+      <button class="move tr" type="button" data-persona="split" aria-pressed="false">
+        <span>Cut it into exact equal parts</span>
+        <svg class="fork doodle" viewBox="0 0 40 40" aria-hidden="true"><path class="stroke" d="M32 8L14 26M30 18l-8-2M26 4l-4 8M14 26l-8 8"></path></svg>
+      </button>
+      <button class="move bl" type="button" data-persona="ate" aria-pressed="false">
+        <svg class="fork doodle" viewBox="0 0 40 40" aria-hidden="true"><path class="stroke" d="M8 32l18-18M6 26l8 2M12 36l2-8M26 14l8-8"></path></svg>
+        <span>Already ate it while everyone was deciding</span>
+      </button>
+      <button class="move br" type="button" data-persona="wait" aria-pressed="false">
+        <svg class="fork doodle" viewBox="0 0 40 40" aria-hidden="true"><path class="stroke" d="M32 32L14 14M34 26l-8 2M28 36l-2-8M14 14L6 6"></path></svg>
+        <span>Wait for someone to say “you have it”</span>
+      </button>
+      <div class="plate" aria-hidden="true">
+        <svg viewBox="0 0 120 120" class="doodle"><circle cx="60" cy="60" r="56" fill="var(--paper)"></circle><circle cx="60" cy="60" r="56" fill="none" stroke="var(--ink)" stroke-width="3"></circle><circle cx="60" cy="60" r="40" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 6"></circle></svg>
+      </div>
+      <div class="piece" id="piece" aria-hidden="true">
+        <svg viewBox="0 0 60 60" class="doodle"><path d="M10 34c0-14 12-24 24-22s18 12 14 24-16 14-26 12S10 42 10 34z" fill="var(--saffron)" stroke="var(--ink)" stroke-width="3"></path><path d="M20 30c4-4 10-6 16-4M24 40c4 0 8-1 12-4" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"></path><path d="M48 8l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5"></path></svg>
+      </div>
+    </div>
+    <div class="push">
+      <button class="btn" type="button" id="q2Next" disabled>Add the masala</button>
+    </div>
+  </section>
+
+  <!-- Q3 -->
+  <section class="screen" id="s-q3" hidden>
+    <span class="eyebrow">Layer 3 of 3 · Garnish</span>
+    <h2>The best bite on your plate. When does it go?</h2>
+    <div class="bites" role="group" aria-label="Best bite">
+      <button class="bite" type="button" data-bite="first" aria-pressed="false">
+        <svg viewBox="0 0 40 40" aria-hidden="true" class="doodle"><path class="stroke" d="M6 20h24M22 10l10 10-10 10"></path></svg>
+        <b>First. Life is short.</b>
+      </button>
+      <button class="bite" type="button" data-bite="last" aria-pressed="false">
+        <svg viewBox="0 0 40 40" aria-hidden="true" class="doodle"><circle class="stroke" cx="20" cy="20" r="14"></circle><path class="stroke" d="M20 12v9l6 4"></path></svg>
+        <b>Last. Saving the best.</b>
+      </button>
+      <button class="bite" type="button" data-bite="give" aria-pressed="false">
+        <svg viewBox="0 0 40 40" aria-hidden="true" class="doodle"><path class="stroke" d="M20 33S6 24 6 15a7 7 0 0 1 14-2 7 7 0 0 1 14 2c0 9-14 18-14 18z"></path></svg>
+        <b>I give it to someone I love.</b>
+      </button>
+      <button class="bite" type="button" data-bite="every" aria-pressed="false">
+        <svg viewBox="0 0 40 40" aria-hidden="true" class="doodle"><path class="stroke" d="M20 20c-4-6-14-6-14 0s10 6 14 0 14-6 14 0-10 6-14 0z"></path></svg>
+        <b>Every bite is the best bite.</b>
+      </button>
+    </div>
+    <div class="push">
+      <button class="btn" type="button" id="q3Next" disabled>Garnish it</button>
+    </div>
+  </section>
+
+  <!-- Seal -->
+  <section class="screen" id="s-seal" hidden>
+    <span class="eyebrow">Last step · Seal the dum</span>
+    <h2>Seal the dum. Smile when the lid lifts.</h2>
+    <div class="seal-stage">
+      <div class="face" id="faceBox" hidden><video id="cam" playsinline muted></video><img id="faceImg" alt="Your selfie" hidden></div>
+      <svg class="pot doodle" viewBox="0 0 300 300" aria-hidden="true">
+        <path class="stroke" id="sealSteam" d="M112 58c-10-14 10-20 0-34M150 48c-10-14 10-20 0-34M188 58c-10-14 10-20 0-34" opacity=".5"></path>
+        <path d="M42 126C42 232 98 284 150 284S258 232 258 126Z" fill="var(--brass)"></path>
+        <path class="stroke" d="M42 126C42 232 98 284 150 284S258 232 258 126"></path>
+        <rect x="30" y="104" width="240" height="22" rx="11" fill="var(--rice)" stroke="var(--paper)" stroke-width="3"></rect>
+        <rect id="sealRing" x="30" y="104" width="240" height="22" rx="11" fill="none" stroke="var(--saffron)" stroke-width="7"></rect>
+        <g id="sealLid">
+          <path d="M60 104C62 70 104 50 150 50S238 70 240 104Z" fill="var(--chilli)"></path>
+          <path class="stroke" d="M60 104C62 70 104 50 150 50S238 70 240 104Z"></path>
+          <rect x="132" y="34" width="36" height="18" rx="8" fill="var(--chilli)" class="stroke"></rect>
+          <text x="150" y="92" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="600" font-size="17" letter-spacing="3" fill="var(--paper)">BAGARA</text>
+        </g>
+      </svg>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+    <div class="push">
+      <button class="btn alt" type="button" id="selfieBtn">Take my selfie</button>
+      <input type="file" id="selfie" accept="image/*" capture="user" class="vh">
+      <label for="selfie" class="btn alt" id="fileBtn" hidden>Use my camera app instead</label>
+      <button class="btn ghost" type="button" id="noPhoto">No photo, keep the lid on</button>
+      <p class="note" id="camNote">Your camera opens right here. The screen flashes white to light your face. In this test, the photo stays on your phone.</p>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section class="screen" id="s-form" hidden>
+    <span class="eyebrow">Your pot is ready</span>
+    <div class="preview"><img id="previewImg" alt="Top half of your card"><span class="preview-tag">THE REST ARRIVES ON WHATSAPP</span></div>
+    <h2>Where should we send your card?</h2>
+    <form id="sendForm" novalidate style="display:flex; flex-direction:column; gap:14px">
+      <div class="field"><label for="fname">First name (goes on your card)</label><input id="fname" name="fname" autocomplete="given-name" maxlength="16" placeholder="Arjun"></div>
+      <div class="field"><label for="phone">WhatsApp number</label><div class="phone-row"><span>+91</span><input id="phone" name="phone" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="98765 43210"></div></div>
+      <label class="check" for="optin"><input type="checkbox" id="optin"><span>Also send me Bagara news and offers. Optional.</span></label>
+      <div class="err" id="err" aria-live="polite"></div>
+      <p class="banner">TEST VERSION: nothing you type here is saved or sent. In the real app this sends your card on WhatsApp.</p>
+      <button class="btn" type="submit">Show my card</button>
+      <button class="link" type="button" id="skipForm">Skip and show my card</button>
+    </form>
+  </section>
+
+  <!-- Card -->
+  <section class="screen" id="s-card" hidden>
+    <span class="eyebrow" id="cardEyebrow">Lid’s off</span>
+    <div class="card-wrap"><img id="cardImg" alt="Your Bagara card"></div>
+    <div class="row">
+      <button class="btn alt" type="button" id="shareBtn">Share card</button>
+      <button class="btn ghost" type="button" id="saveBtn">Save</button>
+    </div>
+    <button class="link" type="button" id="againBtn">Play again</button>
+    <p class="toast" id="toast" aria-live="polite"></p>
+    <div class="sealed">
+      <svg viewBox="0 0 96 96" aria-hidden="true" class="doodle"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--saffron)" stroke-width="10" stroke-dasharray="10 6"></circle><rect x="34" y="44" width="28" height="22" rx="4" fill="var(--chilli)"></rect><path d="M39 44v-6a9 9 0 0 1 18 0v6" fill="none" stroke="var(--chilli)" stroke-width="5"></path></svg>
+      <div><b>Your fortune is on dum</b><p class="teaser" id="teaser"></p></div>
+    </div>
+    <div class="diary">
+      <span class="eyebrow">Your dum diary</span>
+      <div class="diary-row" id="diaryRow"></div>
+      <p class="hint">Every visit adds a pot. Next time we’ll show how your mood moved.</p>
+    </div>
+  </section>
+</div>
+
+<div class="flash" id="flash" aria-hidden="true"></div>
+<canvas id="cardCanvas" width="1080" height="1350" hidden></canvas>
+
+<script>
+(function () {
+  "use strict";
+  var MOODS = {
+    whistle: { tag: "WHISTLE MODE", short: "WHISTLE", level: 0.92 },
+    sizzle: { tag: "TADKA MODE", short: "TADKA", level: 0.74 },
+    simmer: { tag: "DUM MODE", short: "DUM", level: 0.56 }
+  };
+  var PERSONAS = {
+    offer: { name: "The Raita Diplomat", short: "DIPLOMAT", line: "Offers it to everyone. Eats it anyway. Somehow everyone is happy.", fortune: "Within 30 days you’ll settle an argument nobody else could.", bg: "#0B7A50", fg: "#FFF3DC", accent: "#FFB61E", masala: "#E0A030" },
+    split: { name: "The Bucket Captain", short: "CAPTAIN", line: "Cuts the last piece into exact equal parts. Runs the table.", fortune: "Within 30 days you’ll plan a night nobody asked for. It’ll be the best one this month.", bg: "#FFB61E", fg: "#1E1410", accent: "#C8281A", masala: "#C8281A" },
+    ate: { name: "The Midnight Dum Raider", short: "RAIDER", line: "Ate the last piece while everyone was still deciding.", fortune: "Within 30 days a quick bite turns into a full plan.", bg: "#3A2FA8", fg: "#FFF3DC", accent: "#FF6FAE", masala: "#FF6FAE" },
+    wait: { name: "The Secret Masala", short: "STRATEGIST", line: "Waits for someone to say “you have it.” Always gets it.", fortune: "Within 30 days you’ll hear news before it’s news. Keep it in the pot.", bg: "#C8281A", fg: "#FFF3DC", accent: "#FFB61E", masala: "#FFB61E" }
+  };
+  var BITES = {
+    first: { line: "Eats the best bite first. Life is short.", garnish: "SAFFRON", color: "#FFB61E" },
+    last: { line: "Saves the best bite for last. Patience level: dum.", garnish: "FRIED ONIONS", color: "#8A4B1F" },
+    give: { line: "Gives the best bite away. Big heart.", garnish: "MINT", color: "#2FBF71" },
+    every: { line: "Every bite is the best bite. No notes.", garnish: "CORIANDER", color: "#7CC242" }
+  };
+  var STEPS = { welcome: "What’s your Bagara?", q1: "Layer 1 of 3", q2: "Layer 2 of 3", q3: "Layer 3 of 3", seal: "Sealing the dum", form: "Almost there", card: "Lid’s off" };
+
+  var state = { mood: null, persona: null, bite: null, photo: null, photoUrl: null, name: "" };
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- pot drawing (svg) ---------- */
+  function potMarkup(id, s) {
+    var mood = s.mood ? MOODS[s.mood] : null;
+    var h = mood ? 30 + mood.level * 90 : 0;
+    var riceY = 256 - h;
+    var masala = s.persona ? PERSONAS[s.persona].masala : null;
+    var gar = s.bite ? BITES[s.bite].color : null;
+    var out = '<defs><clipPath id="clip' + id + '"><path d="M40 92C40 196 96 248 150 248S260 196 260 92Z"></path></clipPath></defs>';
+    out += '<path d="M40 92C40 196 96 248 150 248S260 196 260 92Z" fill="rgba(0,0,0,.25)"></path>';
+    out += '<g clip-path="url(#clip' + id + ')">';
+    if (mood) out += '<rect x="0" y="' + riceY + '" width="300" height="300" fill="#F7E9C6"></rect>';
+    if (masala) out += '<rect x="0" y="' + (riceY - 26) + '" width="300" height="26" fill="' + masala + '"></rect>';
+    if (gar) out += '<rect x="0" y="' + (riceY - 42) + '" width="300" height="16" fill="' + gar + '"></rect>';
+    out += '</g><path d="M40 92C40 196 96 248 150 248S260 196 260 92" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round"></path>';
+    out += '<rect x="22" y="78" width="256" height="18" rx="9" fill="currentColor"></rect>';
+    return out;
+  }
+  function refreshMini() { $("miniPot").innerHTML = potMarkup("m", state); }
+
+  /* ---------- screens ---------- */
+  function show(name) {
+    ["welcome", "q1", "q2", "q3", "seal", "form", "card"].forEach(function (n) { $("s-" + n).hidden = n !== name; });
+    document.body.setAttribute("data-screen", name);
+    $("stepLabel").textContent = STEPS[name];
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- hand-drawn boil ---------- */
+  if (!reduce) {
+    var seed = 2; var noise = $("wobNoise");
+    setInterval(function () { seed = seed % 4 + 1; noise.setAttribute("seed", String(seed)); }, 170);
+  }
+
+  /* ---------- sound ---------- */
+  var ac = null;
+  function audio() {
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } }
+    if (ac && ac.state === "suspended") { ac.resume().catch(function () {}); }
+    return ac;
+  }
+  function noiseSrc(a, dur) {
+    var len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var s = a.createBufferSource(); s.buffer = buf; return s;
+  }
+  function playSound(kind) {
+    var a = audio(); if (!a) return;
+    var t = a.currentTime, out = a.createGain(); out.gain.value = 0.9; out.connect(a.destination);
+    if (kind === "whistle") {
+      var o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+      o.type = "sine"; o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(2300, t + 0.3);
+      lfo.frequency.value = 7; lg.gain.value = 45; lfo.connect(lg); lg.connect(o.frequency);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.18, t + 0.12); g.gain.setValueAtTime(0.18, t + 1.1); g.gain.linearRampToValueAtTime(0, t + 1.35);
+      o.connect(g); g.connect(out); o.start(t); lfo.start(t); o.stop(t + 1.4); lfo.stop(t + 1.4);
+      var n = noiseSrc(a, 1.4), bp = a.createBiquadFilter(), ng = a.createGain();
+      bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 2.5;
+      ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(0.35, t + 0.15); ng.gain.linearRampToValueAtTime(0, t + 1.35);
+      n.connect(bp); bp.connect(ng); ng.connect(out); n.start(t);
+    } else if (kind === "sizzle") {
+      var sn = noiseSrc(a, 1.5), hp = a.createBiquadFilter(), sg = a.createGain();
+      hp.type = "highpass"; hp.frequency.value = 2800;
+      sg.gain.setValueAtTime(0, t);
+      for (var k = 0; k < 70; k++) sg.gain.setValueAtTime(0.05 + Math.random() * 0.32, t + k * 0.02);
+      sg.gain.linearRampToValueAtTime(0, t + 1.5);
+      sn.connect(hp); hp.connect(sg); sg.connect(out); sn.start(t);
+      for (var p = 0; p < 9; p++) {
+        var pt = t + Math.random() * 1.3, pn = noiseSrc(a, 0.03), pg = a.createGain();
+        pg.gain.setValueAtTime(0.5, pt); pg.gain.exponentialRampToValueAtTime(0.001, pt + 0.03);
+        pn.connect(pg); pg.connect(out); pn.start(pt);
+      }
+    } else {
+      for (var b = 0; b < 11; b++) {
+        var bt = t + b * 0.14 + Math.random() * 0.07, bo = a.createOscillator(), bg = a.createGain(), f0 = 170 + Math.random() * 140;
+        bo.type = "sine"; bo.frequency.setValueAtTime(f0, bt); bo.frequency.exponentialRampToValueAtTime(f0 * 1.7, bt + 0.07);
+        bg.gain.setValueAtTime(0, bt); bg.gain.linearRampToValueAtTime(0.28, bt + 0.015); bg.gain.exponentialRampToValueAtTime(0.001, bt + 0.09);
+        bo.connect(bg); bg.connect(out); bo.start(bt); bo.stop(bt + 0.1);
+      }
+    }
+  }
+
+  /* ---------- Q1 ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".sound"), function (btn) {
+    btn.addEventListener("click", function () {
+      state.mood = btn.getAttribute("data-mood");
+      Array.prototype.forEach.call(document.querySelectorAll(".sound"), function (b) { b.setAttribute("aria-pressed", String(b === btn)); b.classList.remove("playing"); });
+      btn.classList.add("playing"); setTimeout(function () { btn.classList.remove("playing"); }, 1300);
+      playSound(state.mood); refreshMini(); $("q1Next").disabled = false;
+    });
+  });
+
+  /* ---------- Q2 drag ---------- */
+  var piece = $("piece"), zone = $("plateZone"), drag = null;
+  function pickPersona(btn) {
+    state.persona = btn.getAttribute("data-persona");
+    Array.prototype.forEach.call(document.querySelectorAll(".move"), function (b) { b.setAttribute("aria-pressed", String(b === btn)); b.classList.remove("hot"); });
+    var zr = zone.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var dx = (br.left + br.width / 2) - (zr.left + zr.width / 2), dy = (br.top + br.height / 2) - (zr.top + zr.height / 2);
+    piece.style.transform = "translate(" + (dx * 0.62) + "px," + (dy * 0.62) + "px) rotate(" + (dx > 0 ? 18 : -18) + "deg)";
+    refreshMini(); $("q2Next").disabled = false;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".move"), function (btn) { btn.addEventListener("click", function () { pickPersona(btn); }); });
+  function moveUnder(x, y) {
+    piece.style.visibility = "hidden"; var el = document.elementFromPoint(x, y); piece.style.visibility = "";
+    return el && el.closest ? el.closest(".move") : null;
+  }
+  piece.addEventListener("pointerdown", function (e) {
+    e.preventDefault();
+    var m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(piece.style.transform || "");
+    drag = { x: e.clientX, y: e.clientY, ox: m ? parseFloat(m[1]) : 0, oy: m ? parseFloat(m[2]) : 0 };
+    piece.classList.add("dragging");
+    try { piece.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  piece.addEventListener("pointermove", function (e) {
+    if (!drag) return;
+    piece.style.transform = "translate(" + (drag.ox + e.clientX - drag.x) + "px," + (drag.oy + e.clientY - drag.y) + "px) scale(1.12)";
+    var over = moveUnder(e.clientX, e.clientY);
+    Array.prototype.forEach.call(document.querySelectorAll(".move"), function (b) { b.classList.toggle("hot", b === over); });
+  });
+  function endDrag(e) {
+    if (!drag) return;
+    piece.classList.remove("dragging");
+    var target = moveUnder(e.clientX, e.clientY), moved = Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y);
+    drag = null;
+    if (target && moved > 8) { pickPersona(target); }
+    else if (state.persona) { pickPersona(document.querySelector('.move[data-persona="' + state.persona + '"]')); }
+    else { piece.style.transform = ""; }
+  }
+  piece.addEventListener("pointerup", endDrag);
+  piece.addEventListener("pointercancel", endDrag);
+
+  /* ---------- Q3 ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".bite"), function (btn) {
+    btn.addEventListener("click", function () {
+      state.bite = btn.getAttribute("data-bite");
+      Array.prototype.forEach.call(document.querySelectorAll(".bite"), function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+      refreshMini(); $("q3Next").disabled = false;
+    });
+  });
+
+  /* ---------- seal + selfie ---------- */
+  var stream = null;
+  function stopCam() { if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } $("cam").srcObject = null; }
+  function hideSealButtons() { $("selfieBtn").hidden = true; $("fileBtn").hidden = true; $("noPhoto").hidden = true; }
+  function runSeal(onDum, liftLid) {
+    hideSealButtons();
+    var lid = $("sealLid"), ring = $("sealRing"), count = $("count");
+    lid.classList.remove("up"); ring.classList.add("on");
+    var seq = ["3", "2", "1", "DUM!"], i = 0, step = reduce ? 250 : 750;
+    function tick() {
+      count.textContent = seq[i];
+      if (i === 2 && onDum) { setTimeout(function () { $("flash").classList.add("on"); }, step - 160); }
+      if (i === 3) {
+        var got = onDum ? onDum() : false;
+        if (got || liftLid) {
+          setTimeout(function () { lid.classList.add("up"); $("faceBox").hidden = false; requestAnimationFrame(function () { $("faceBox").classList.add("show"); }); }, step / 2);
+        }
+        setTimeout(function () { count.textContent = ""; goForm(); }, (got || liftLid) ? step * 2.6 : step * 1.4);
+        return;
+      }
+      i++; setTimeout(tick, step);
+    }
+    tick();
+  }
+  function capture() {
+    var v = $("cam"), w = v.videoWidth, h = v.videoHeight;
+    if (!w || !h) { stopCam(); $("flash").classList.remove("on"); return false; }
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var x = c.getContext("2d"); x.translate(w, 0); x.scale(-1, 1); x.drawImage(v, 0, 0, w, h);
+    stopCam();
+    $("flash").classList.remove("on");
+    state.photo = c; $("faceImg").src = c.toDataURL("image/jpeg", 0.85); $("faceImg").hidden = false; $("cam").hidden = true;
+    return true;
+  }
+  function camFail() {
+    stopCam();
+    $("selfieBtn").hidden = true; $("fileBtn").hidden = false; $("noPhoto").hidden = false;
+    $("camNote").textContent = "The camera didn’t open on this page. Use your camera app instead, or skip the photo.";
+  }
+  $("selfieBtn").addEventListener("click", function () {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFail(); return; }
+    $("selfieBtn").disabled = true;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 960 }, height: { ideal: 960 } }, audio: false })
+      .then(function (st) {
+        stream = st; var v = $("cam"); v.hidden = false; v.srcObject = st;
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+        $("faceImg").hidden = true; $("faceBox").hidden = false;
+        requestAnimationFrame(function () { $("faceBox").classList.add("show"); });
+        setTimeout(function () { runSeal(capture, false); }, 600);
+      })
+      .catch(function () { $("selfieBtn").disabled = false; camFail(); });
+  });
+  $("selfie").addEventListener("change", function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    if (state.photoUrl) URL.revokeObjectURL(state.photoUrl);
+    state.photoUrl = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function () { state.photo = img; $("faceImg").src = state.photoUrl; $("faceImg").hidden = false; $("cam").hidden = true; runSeal(null, true); };
+    img.onerror = function () { state.photo = null; runSeal(null, false); };
+    img.src = state.photoUrl;
+  });
+  $("noPhoto").addEventListener("click", function () { stopCam(); state.photo = null; runSeal(null, false); });
+
+  /* ---------- canvas card ---------- */
+  function wrapLines(ctx, text, maxW) {
+    var words = text.split(" "), lines = [], cur = "";
+    words.forEach(function (w) { var t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else { cur = t; } });
+    if (cur) lines.push(cur); return lines;
+  }
+  function halftone(ctx, img, cx, cy, r, bg, fg) {
+    var step = 10, n = Math.ceil(2 * r / step), off = document.createElement("canvas");
+    off.width = n; off.height = n;
+    var o = off.getContext("2d"), s = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height);
+    var sx = ((img.naturalWidth || img.width) - s) / 2, sy = ((img.naturalHeight || img.height) - s) / 2 * 0.7;
+    o.drawImage(img, sx, sy, s, s, 0, 0, n, n);
+    var d = o.getImageData(0, 0, n, n).data, lum = [], i;
+    for (i = 0; i < n * n; i++) lum.push(0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2]);
+    var sorted = lum.slice().sort(function (a, b) { return a - b; });
+    var lo = sorted[Math.floor(sorted.length * 0.05)], hi = sorted[Math.floor(sorted.length * 0.95)] || 255;
+    if (hi - lo < 20) { hi = lo + 20; }
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+    ctx.fillStyle = bg; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r); ctx.fillStyle = fg;
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      var v = Math.max(0, Math.min(1, (lum[y * n + x] - lo) / (hi - lo)));
+      var rad = step * 0.62 * Math.sqrt(v);
+      if (rad > 0.6) { ctx.beginPath(); ctx.arc(cx - r + (x + 0.5) * step, cy - r + (y + 0.5) * step, rad, 0, Math.PI * 2); ctx.fill(); }
+    }
+    ctx.restore();
+  }
+  function squiggle(ctx, x, y, h, jit) {
+    ctx.beginPath(); ctx.moveTo(x, y);
+    for (var k = 1; k <= 4; k++) { ctx.quadraticCurveTo(x + (k % 2 ? 14 : -14) + (Math.random() - 0.5) * jit, y - h * (k - 0.5) / 4, x, y - h * k / 4); }
+    ctx.stroke();
+  }
+  function drawCard(withName) {
+    var c = $("cardCanvas"), ctx = c.getContext("2d");
+    var P = PERSONAS[state.persona || "offer"], M = MOODS[state.mood || "sizzle"], B = BITES[state.bite || "first"];
+    var W = 1080, H = 1350;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    /* print grain */
+    ctx.globalAlpha = 0.06; ctx.fillStyle = P.fg;
+    for (var g = 0; g < 2600; g++) ctx.fillRect(Math.random() * W, Math.random() * H, 2, 2);
+    ctx.globalAlpha = 1;
+    /* header */
+    ctx.fillStyle = P.fg; ctx.textBaseline = "alphabetic";
+    ctx.font = "600 34px 'IBM Plex Mono', monospace"; ctx.fillText("BAGARA BIRYANI CAFE", 64, 100);
+    ctx.font = "600 28px 'IBM Plex Mono', monospace";
+    var tw = ctx.measureText(M.tag).width;
+    ctx.fillStyle = P.fg; roundRect(ctx, W - 64 - tw - 44, 62, tw + 44, 54, 27); ctx.fill();
+    ctx.fillStyle = P.bg; ctx.fillText(M.tag, W - 64 - tw - 22, 99);
+    /* face or lid */
+    var cx = 540, cy = 360, r = 196;
+    if (state.photo) {
+      var lightBg = P.fg === "#1E1410";
+      halftone(ctx, state.photo, cx, cy, r, lightBg ? "#1E1410" : shade(P.bg), lightBg ? "#FFF3DC" : P.fg);
+      ctx.lineWidth = 8; ctx.strokeStyle = P.fg; ctx.setLineDash([4, 18]); ctx.lineCap = "round";
+      ctx.beginPath(); ctx.arc(cx, cy, r + 14, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    } else {
+      ctx.fillStyle = P.accent; ctx.strokeStyle = P.fg; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(300, 470); ctx.bezierCurveTo(310, 300, 420, 250, 540, 250); ctx.bezierCurveTo(660, 250, 770, 300, 780, 470); ctx.closePath(); ctx.fill(); ctx.stroke();
+      roundRect(ctx, 500, 214, 80, 40, 14); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = P.bg === "#FFB61E" ? "#FFF3DC" : P.bg;
+      ctx.font = "600 44px 'IBM Plex Mono', monospace"; ctx.textAlign = "center"; ctx.fillText("BAGARA", 540, 410);
+      ctx.fillStyle = P.fg; ctx.font = "400 34px 'Bricolage Grotesque', sans-serif"; ctx.fillText("Kept the lid on. Mysterious.", 540, 530); ctx.textAlign = "left";
+    }
+    /* steam */
+    ctx.strokeStyle = P.fg; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.globalAlpha = 0.6;
+    [440, 540, 640].forEach(function (x) { squiggle(ctx, x, 640, 60, 8); });
+    ctx.globalAlpha = 1;
+    /* pot cross-section */
+    var top = 668, bottom = 880;
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(300, top); ctx.bezierCurveTo(300, 830, 420, bottom, 540, bottom); ctx.bezierCurveTo(660, bottom, 780, 830, 780, top); ctx.closePath();
+    ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.fill(); ctx.clip();
+    var riceTop = bottom - (50 + M.level * 100);
+    ctx.fillStyle = "#F7E9C6"; ctx.fillRect(280, riceTop, 520, 400);
+    ctx.fillStyle = P.masala; ctx.fillRect(280, riceTop - 34, 520, 34);
+    ctx.fillStyle = B.color; ctx.fillRect(280, riceTop - 54, 520, 20);
+    ctx.restore();
+    ctx.strokeStyle = P.fg; ctx.lineWidth = 12;
+    ctx.beginPath(); ctx.moveTo(300, top); ctx.bezierCurveTo(300, 830, 420, bottom, 540, bottom); ctx.bezierCurveTo(660, bottom, 780, 830, 780, top); ctx.stroke();
+    ctx.fillStyle = P.fg; roundRect(ctx, 276, top - 18, 528, 26, 13); ctx.fill();
+    /* labels */
+    ctx.lineWidth = 3; ctx.strokeStyle = P.fg;
+    label(ctx, P, 64, riceTop - 54, "GARNISH", B.garnish, 296, riceTop - 44, "left");
+    label(ctx, P, W - 64, riceTop - 6, "MASALA", P.short, 784, riceTop - 17, "right");
+    label(ctx, P, 64, riceTop + 110, "RICE", M.short, 330, riceTop + 80, "left");
+    /* name */
+    ctx.textAlign = "center"; ctx.fillStyle = P.fg;
+    ctx.font = "600 30px 'IBM Plex Mono', monospace";
+    var who = withName && state.name ? state.name.toUpperCase() + " IS" : "LID’S OFF. YOU ARE";
+    ctx.fillText(who, 540, 950);
+    var size = 96; ctx.font = size + "px Shrikhand, serif";
+    while (ctx.measureText(P.name).width > 950 && size > 70) { size -= 4; ctx.font = size + "px Shrikhand, serif"; }
+    var nameLines = ctx.measureText(P.name).width > 950 ? wrapLines(ctx, P.name, 950) : [P.name];
+    var y = 950 + size + 6;
+    nameLines.forEach(function (ln) {
+      ctx.fillStyle = P.accent; ctx.fillText(ln, 545, y + 5);
+      ctx.fillStyle = P.fg; ctx.fillText(ln, 540, y);
+      y += size * 1.0;
+    });
+    ctx.font = "400 34px 'Bricolage Grotesque', sans-serif";
+    y += 4;
+    var room = Math.max(1, Math.floor((1240 - y) / 42) + 1);
+    var lines = wrapLines(ctx, P.line + " " + B.line, 920).slice(0, Math.min(3, room));
+    lines.forEach(function (ln) { ctx.fillText(ln, 540, y); y += 42; });
+    /* footer */
+    ctx.textAlign = "left";
+    ctx.setLineDash([12, 10]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(64, 1256); ctx.lineTo(W - 64, 1256); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = "600 26px 'IBM Plex Mono', monospace"; ctx.fillText("FORTUNE SEALED ON DUM · OPENS NEXT VISIT", 64, 1300);
+    ctx.font = "500 22px 'IBM Plex Mono', monospace"; ctx.globalAlpha = 0.85;
+    ctx.fillText(new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }).toUpperCase(), 64, 1330);
+    ctx.globalAlpha = 1;
+    return new Promise(function (res) { c.toBlob(function (b) { res(b); }, "image/png"); });
+  }
+  function label(ctx, P, x, y, cat, val, px, py, align) {
+    ctx.textAlign = align;
+    ctx.globalAlpha = 0.8; ctx.font = "500 22px 'IBM Plex Mono', monospace"; ctx.fillText(cat, x, y);
+    ctx.globalAlpha = 1; ctx.font = "600 28px 'IBM Plex Mono', monospace"; ctx.fillText(val, x, y + 34);
+    var tw = ctx.measureText(val).width, lx = align === "left" ? x + Math.max(tw, 120) + 12 : x - Math.max(tw, 120) - 12;
+    ctx.beginPath(); ctx.moveTo(lx, y + 22); ctx.lineTo(px, py); ctx.stroke();
+    ctx.textAlign = "left";
+  }
+  function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function shade(hex) {
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return "rgb(" + Math.round(r * 0.55) + "," + Math.round(g * 0.55) + "," + Math.round(b * 0.55) + ")";
+  }
+  var fontsReady = null;
+  function loadFonts() {
+    if (!fontsReady) {
+      fontsReady = Promise.all([
+        document.fonts.load("96px Shrikhand"), document.fonts.load("600 30px 'IBM Plex Mono'"),
+        document.fonts.load("500 22px 'IBM Plex Mono'"), document.fonts.load("400 34px 'Bricolage Grotesque'")
+      ]).catch(function () {});
+    }
+    return fontsReady;
+  }
+  var cardBlob = null, cardUrl = null;
+  function render(withName, imgEl) {
+    return loadFonts().then(function () { return drawCard(withName); }).then(function (blob) {
+      cardBlob = blob; if (cardUrl) URL.revokeObjectURL(cardUrl);
+      cardUrl = URL.createObjectURL(blob); imgEl.src = cardUrl;
+    });
+  }
+
+  /* ---------- form + card ---------- */
+  function goForm() { show("form"); render(false, $("previewImg")); }
+  function goCard() {
+    var P = PERSONAS[state.persona || "offer"];
+    $("teaser").textContent = P.fortune.split(" ").slice(0, 6).join(" ") + "… Opens on your next visit.";
+    $("diaryRow").innerHTML = '<div><svg viewBox="0 0 300 260" role="img" aria-label="Tonight’s pot">' + potMarkup("d1", state) + '</svg>TONIGHT</div>' +
+      ["VISIT 2", "VISIT 3", "VISIT 4", "VISIT 5"].map(function (l) { return '<div><svg viewBox="0 0 300 260" aria-hidden="true"><path d="M40 92C40 196 96 248 150 248S260 196 260 92Z" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="18 14" opacity=".6"></path></svg>' + l + '</div>'; }).join("");
+    $("cardEyebrow").textContent = state.name ? state.name + ", your lid is off" : "Lid’s off";
+    show("card"); render(true, $("cardImg"));
+  }
+  $("sendForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var ph = $("phone").value.replace(/\D/g, "");
+    if (ph && ph.length !== 10) { $("err").textContent = "Enter a 10-digit mobile number, or skip."; return; }
+    $("err").textContent = "";
+    state.name = $("fname").value.trim().slice(0, 16);
+    goCard();
+  });
+  $("skipForm").addEventListener("click", function () { state.name = $("fname").value.trim().slice(0, 16); goCard(); });
+
+  function cardFile() { return new File([cardBlob], "my-bagara-card.png", { type: "image/png" }); }
+  function saveCard() {
+    var a = document.createElement("a"); a.href = cardUrl; a.download = "my-bagara-card.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    $("toast").textContent = "Card saved. On some phones, press and hold the card to save it instead.";
+  }
+  $("shareBtn").addEventListener("click", function () {
+    if (!cardBlob) return;
+    var f = cardFile();
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      navigator.share({ files: [f], title: "My Bagara card", text: "What’s your Bagara? Played at Bagara Biryani Cafe." })
+        .then(function () { $("toast").textContent = "Shared."; })
+        .catch(function (e) { if (!e || e.name !== "AbortError") saveCard(); });
+    } else { saveCard(); }
+  });
+  $("saveBtn").addEventListener("click", function () { if (cardBlob) saveCard(); });
+
+  function reset() {
+    state = { mood: null, persona: null, bite: null, photo: null, photoUrl: null, name: "" };
+    Array.prototype.forEach.call(document.querySelectorAll("[aria-pressed]"), function (b) { b.setAttribute("aria-pressed", "false"); });
+    ["q1Next", "q2Next", "q3Next"].forEach(function (id) { $(id).disabled = true; });
+    stopCam(); piece.style.transform = ""; $("selfie").value = ""; $("selfieBtn").hidden = false; $("selfieBtn").disabled = false; $("fileBtn").hidden = true; $("noPhoto").hidden = false;
+    $("camNote").textContent = "Your camera opens right here. The screen flashes white to light your face. In this test, the photo stays on your phone.";
+    $("sealLid").classList.remove("up"); $("sealRing").classList.remove("on"); $("faceBox").classList.remove("show"); $("faceBox").hidden = true; $("faceImg").hidden = true; $("cam").hidden = false;
+    $("fname").value = ""; $("phone").value = ""; $("optin").checked = false; $("toast").textContent = "";
+    refreshMini(); show("welcome");
+  }
+  $("againBtn").addEventListener("click", reset);
+  $("startBtn").addEventListener("click", function () { audio(); show("q1"); });
+  $("q1Next").addEventListener("click", function () { show("q2"); });
+  $("q2Next").addEventListener("click", function () { show("q3"); });
+  $("q3Next").addEventListener("click", function () { show("seal"); });
+
+  refreshMini(); show("welcome"); loadFonts();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add("ready"); }); });
+})();
+</script>
+</body>
+</html>

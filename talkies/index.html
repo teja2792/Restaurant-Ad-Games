@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFD400">
+<title>Bagara Talkies | Bagara Biryani Cafe</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Archivo:wdth,wght@62..125,400..800&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column styled like a single-screen cinema hoarding; each scene is its own poster colour, Bungee lettering with offset shadows, screenplay-typewriter labels. */
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+:root {
+  --yellow: #FFD400;
+  --magenta: #C8175D;
+  --blue: #2135E0;
+  --purple: #6A1FB0;
+  --ink: #15101C;
+  --paper: #FFF6E8;
+  --orange: #FF7A1A;
+  --cyan: #33D6E8;
+  --seat: #B3122E;
+  --display: "Bungee", "Impact", "Arial Black", sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --script: "Courier Prime", "Courier New", monospace;
+  --fg: var(--ink);
+  --bg: var(--yellow);
+  --pop: var(--magenta);
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+}
+body.ready { transition: background-color .35s ease; }
+body[data-screen="welcome"] { --bg: var(--yellow); --fg: var(--ink); --pop: var(--magenta); }
+body[data-screen="q1"] { --bg: var(--magenta); --fg: var(--paper); --pop: var(--yellow); }
+body[data-screen="q2"] { --bg: var(--blue); --fg: var(--paper); --pop: var(--yellow); }
+body[data-screen="q3"] { --bg: var(--purple); --fg: var(--paper); --pop: var(--yellow); }
+body[data-screen="seal"] { --bg: var(--ink); --fg: var(--paper); --pop: var(--yellow); }
+body[data-screen="form"] { --bg: var(--paper); --fg: var(--ink); --pop: var(--magenta); }
+body[data-screen="card"] { --bg: var(--ink); --fg: var(--paper); --pop: var(--yellow); }
+
+#app { max-width: 460px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; padding-block: 14px 28px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; }
+.brand { font-family: var(--script); font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.brand small { display: block; font-weight: 400; letter-spacing: .04em; }
+.reel { display: flex; gap: 4px; padding: 5px 6px; background: var(--ink); border-radius: 4px; border: 2px solid var(--fg); }
+.reel i { width: 14px; height: 12px; border-radius: 2px; background: #3A3344; display: block; }
+.reel i.on { background: var(--yellow); }
+.tester { font-family: var(--script); font-weight: 700; font-size: 11px; letter-spacing: .04em; padding: 4px 8px; border: 1.5px solid currentColor; border-radius: 999px; white-space: nowrap; }
+
+.screen { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-top: 10px; }
+.slate { font-family: var(--script); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; display: inline-flex; align-self: flex-start; padding: 4px 10px; border: 2px solid currentColor; }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; text-transform: uppercase; }
+h1 { font-size: clamp(46px, 14vw, 64px); line-height: .92; text-shadow: 5px 5px 0 var(--pop); }
+h2 { font-size: clamp(27px, 7.6vw, 34px); line-height: 1.02; text-shadow: 3px 3px 0 rgba(0,0,0,.28); }
+p { margin: 0; }
+.fusion { font-family: var(--script); font-weight: 700; font-size: 18px; line-height: 1.35; }
+.english { font-size: 16px; opacity: .92; }
+.lede { font-size: 18px; max-width: 34ch; }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 58px; padding: 0 22px; border-radius: 6px;
+  font-family: var(--display); font-weight: 400; font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
+  background: var(--fg); color: var(--bg); border: 3px solid var(--fg); box-shadow: 6px 6px 0 var(--pop);
+  cursor: pointer; text-decoration: none; transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:active { transform: translate(4px,4px); box-shadow: 2px 2px 0 var(--pop); }
+.btn[disabled] { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: none; font-family: var(--body); font-weight: 700; font-size: 17px; text-transform: none; }
+.btn.alt { background: var(--yellow); color: var(--ink); border-color: var(--yellow); box-shadow: 6px 6px 0 var(--magenta); }
+.link { background: none; border: none; color: inherit; font: inherit; font-size: 15px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; min-height: 44px; padding: 0; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.push { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
+.note { font-size: 13px; opacity: .85; }
+.doodle { filter: url(#wob); }
+svg .stroke { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* welcome */
+.marquee { position: relative; display: flex; justify-content: center; padding-top: 4px; }
+.marquee svg { width: min(80%, 300px); height: auto; }
+.clap-top { transform-origin: 62px 102px; animation: clap 2.4s ease-in-out infinite; }
+@keyframes clap { 0%, 60%, 100% { transform: rotate(-22deg); } 70% { transform: rotate(0); } 76% { transform: rotate(-8deg); } 82% { transform: rotate(0); } }
+.burst { position: absolute; font-family: var(--display); font-size: 13px; padding: 8px 10px; background: var(--magenta); color: var(--paper); border: 2px solid var(--ink); transform: rotate(-8deg); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-family: var(--script); font-weight: 700; font-size: 13px; letter-spacing: .06em; padding: 5px 10px; border: 2px solid currentColor; }
+
+/* Q1 film reel */
+.track { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 16px 10px; margin-inline: -16px; scrollbar-width: none; }
+.track::-webkit-scrollbar { display: none; }
+.frame {
+  flex: 0 0 76%; scroll-snap-align: center; display: flex; flex-direction: column; gap: 8px; text-align: left;
+  background: var(--ink); color: var(--paper); border: 3px solid var(--ink); padding: 18px 14px; font: inherit; cursor: pointer; position: relative;
+  box-shadow: 6px 6px 0 rgba(0,0,0,.3);
+}
+.frame::before, .frame::after { content: ""; position: absolute; left: 6px; right: 6px; height: 8px; background: repeating-linear-gradient(90deg, var(--paper) 0 10px, transparent 10px 20px); opacity: .85; }
+.frame::before { top: 4px; } .frame::after { bottom: 4px; }
+.frame .still { background: var(--paper); color: var(--ink); aspect-ratio: 4 / 3; max-width: 100%; display: flex; align-items: center; justify-content: center; margin-top: 6px; }
+.frame .still svg { width: 78%; height: auto; }
+.frame b { font-family: var(--display); font-weight: 400; font-size: 22px; line-height: 1.05; text-transform: uppercase; }
+.frame span { font-size: 15px; }
+.frame .pick { font-family: var(--script); font-weight: 700; font-size: 12px; letter-spacing: .08em; margin-bottom: 6px; color: var(--yellow); }
+.frame[aria-pressed="true"] { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+.frame[aria-pressed="true"] .pick { color: var(--ink); }
+.frame.playing .still svg { animation: jiggle .11s steps(2) infinite; }
+@keyframes jiggle { 0% { transform: translate(0,0) rotate(0); } 100% { transform: translate(1.5px,-1.5px) rotate(2deg); } }
+.dots { display: flex; gap: 8px; justify-content: center; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--paper); display: block; }
+.dots i.on { background: var(--paper); }
+
+/* Q2 snacks */
+.seat-wrap { display: flex; justify-content: center; }
+.seat-wrap svg { width: min(62%, 230px); height: auto; }
+.snack-pop { transform-origin: 150px 70px; animation: pop .4s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pop { 0% { transform: translateY(-40px) scale(.5); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+.snacks { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.snack {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 132px; padding: 12px;
+  border-radius: 6px; border: 3px solid var(--paper); background: transparent; color: var(--paper); font: inherit; font-weight: 700; font-size: 16px; line-height: 1.2; text-align: left; cursor: pointer;
+}
+.snack svg { width: 46px; height: 46px; }
+.snack[aria-pressed="true"] { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+
+/* Q3 dialogue */
+.screenbox { position: relative; background: var(--ink); border: 3px solid var(--ink); aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding: 0 16% 12px; }
+.curtain { position: absolute; top: 0; bottom: 0; width: 15%; background: repeating-linear-gradient(90deg, #8C0F2B 0 8px, #B3122E 8px 16px); }
+.curtain.l { left: 0; } .curtain.r { right: 0; }
+.scene-doodle { position: absolute; inset: 12% 22% 34%; color: #4B4458; }
+.scene-doodle svg { width: 100%; height: 100%; }
+.subtitle { position: relative; text-align: center; font-family: var(--body); font-weight: 800; font-size: 17px; line-height: 1.25; color: var(--yellow); text-shadow: 0 2px 0 #000, 0 0 6px #000; min-height: 44px; }
+.subtitle small { display: block; font-weight: 500; font-size: 12px; color: var(--paper); }
+.lines { display: flex; flex-direction: column; gap: 10px; }
+.line {
+  display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; min-height: 58px; padding: 10px 14px;
+  border-radius: 6px; border: 3px solid var(--paper); background: transparent; color: var(--paper); font: inherit; font-weight: 700; font-size: 16px; line-height: 1.25; text-align: left; cursor: pointer;
+}
+.line em { font-style: normal; font-family: var(--script); font-weight: 700; font-size: 11px; letter-spacing: .08em; padding: 3px 7px; border: 2px solid currentColor; }
+.line[aria-pressed="true"] { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+
+/* seal */
+.stage { position: relative; display: flex; justify-content: center; align-items: flex-end; min-height: 340px; background: radial-gradient(ellipse at 50% 0%, rgba(255,212,0,.32), rgba(255,212,0,0) 62%); }
+.stage svg.board { width: min(84%, 300px); height: auto; color: var(--paper); }
+#clapTop { transform-origin: 34px 112px; transform: rotate(-24deg); transition: transform .18s ease-in; }
+#clapTop.shut { transform: rotate(0); }
+.count { position: absolute; top: 18px; left: 0; right: 0; text-align: center; font-family: var(--display); font-size: 76px; line-height: 1; color: var(--yellow); text-shadow: 5px 5px 0 var(--magenta); pointer-events: none; z-index: 4; }
+.face { position: absolute; top: 4px; left: 50%; width: 164px; height: 164px; margin-left: -82px; border-radius: 50%; overflow: hidden; background: #2A2333; border: 5px solid var(--yellow); opacity: 0; transform: scale(.4) rotate(-20deg); transition: opacity .5s ease, transform .7s cubic-bezier(.2,1.4,.4,1); z-index: 3; }
+.face.show { opacity: 1; transform: scale(1) rotate(0); }
+.face video, .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.face video { transform: scaleX(-1); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+label.btn:focus-within { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.flash { position: fixed; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 20; }
+.flash.on { opacity: .9; transition: none; }
+
+/* form */
+.preview { position: relative; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--magenta); max-height: 260px; overflow: hidden; }
+.preview img { display: block; width: 100%; }
+.preview::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(to bottom, rgba(255,246,232,0), var(--paper) 70%); }
+.preview-tag { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-family: var(--script); font-weight: 700; font-size: 13px; letter-spacing: .08em; z-index: 1; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 700; font-size: 15px; }
+.field input { min-height: 54px; border-radius: 6px; border: 3px solid var(--ink); background: #FFFFFF; color: var(--ink); font: inherit; font-size: 18px; padding: 0 14px; }
+.phone-row { display: flex; gap: 8px; }
+.phone-row span { display: flex; align-items: center; padding: 0 12px; border-radius: 6px; border: 3px solid var(--ink); font-family: var(--script); font-weight: 700; }
+.phone-row input { flex: 1; min-width: 0; }
+.check { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; min-height: 44px; }
+.check input { width: 24px; height: 24px; margin: 0; flex-shrink: 0; accent-color: var(--magenta); }
+.banner { font-family: var(--script); font-size: 13px; line-height: 1.5; padding: 10px 12px; background: var(--ink); color: var(--paper); }
+.err { color: var(--magenta); font-weight: 700; font-size: 14px; min-height: 20px; }
+
+/* card */
+.card-wrap { box-shadow: 8px 8px 0 var(--magenta); }
+.card-wrap img { display: block; width: 100%; height: auto; }
+.row { display: flex; gap: 10px; }
+.row .btn { flex: 1; }
+.toast { font-family: var(--script); font-size: 13px; min-height: 18px; }
+.sequel { background: var(--yellow); color: var(--ink); padding: 18px; display: grid; grid-template-columns: 60px minmax(0,1fr); gap: 14px; align-items: center; }
+.sequel svg { width: 60px; height: 60px; }
+.sequel b { font-family: var(--display); font-weight: 400; font-size: 19px; text-transform: uppercase; line-height: 1.05; display: block; }
+.sequel .teaser { font-size: 15px; margin-top: 4px; }
+.filmo { display: flex; flex-direction: column; gap: 10px; }
+.filmo-row { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; }
+.filmo-row div { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--script); font-weight: 700; font-size: 10px; letter-spacing: .04em; text-align: center; }
+.filmo-row .poster { display: block; width: 100%; aspect-ratio: 4 / 5; max-width: 100%; border: 2px dashed rgba(255,246,232,.6); }
+.filmo-row .poster.on { border: 2px solid var(--yellow); background-size: cover; background-position: center; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="wob"><feTurbulence id="wobNoise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="2"></feTurbulence><feDisplacementMap in="SourceGraphic" scale="3.4"></feDisplacementMap></filter>
+</svg>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Bagara Biryani Cafe<small id="stepLabel">Bagara Talkies</small></div>
+    <div class="reel" aria-label="Scenes done" role="img" id="reel"><i></i><i></i><i></i></div>
+    <span class="tester">TEST VERSION</span>
+  </header>
+
+  <!-- Welcome -->
+  <section class="screen" id="s-welcome">
+    <span class="slate">Bagara Talkies presents</span>
+    <div class="marquee">
+      <svg viewBox="0 -40 300 290" aria-hidden="true" class="doodle" style="color: var(--ink)">
+        <g class="clap-top">
+          <path d="M40 78l224-46 8 34-224 46z" fill="var(--ink)"></path>
+          <path d="M70 72l20 30M120 62l20 30M170 52l20 30M220 42l20 30" stroke="var(--paper)" stroke-width="12"></path>
+          <path class="stroke" d="M40 78l224-46 8 34-224 46z"></path>
+        </g>
+        <rect x="40" y="112" width="232" height="120" fill="var(--paper)"></rect>
+        <path d="M40 112h232v34H40z" fill="var(--ink)"></path>
+        <path d="M70 112l20 34M120 112l20 34M170 112l20 34M220 112l20 34" stroke="var(--paper)" stroke-width="12"></path>
+        <rect class="stroke" x="40" y="112" width="232" height="120"></rect>
+        <text x="56" y="178" font-family="Courier Prime, monospace" font-weight="700" font-size="17" fill="var(--ink)">SCENE: BILL WAIT</text>
+        <text x="56" y="204" font-family="Courier Prime, monospace" font-weight="700" font-size="17" fill="var(--ink)">TAKE: 1</text>
+        <text x="56" y="222" font-family="Courier Prime, monospace" font-weight="700" font-size="13" fill="var(--ink)">STARRING: YOU</text>
+        <path class="stroke" d="M18 40l10 8M14 70l12-2M284 120l12-6M286 160l12 4"></path>
+      </svg>
+      <span class="burst" style="right: 2%; top: 4%">1 MIN</span>
+    </div>
+    <h1>Starring… you.</h1>
+    <p class="fusion">“Bill barta ide, maga. Till then, one small climax.”</p>
+    <p class="lede">Three scenes while the bill comes. Your answers write the film. Your selfie is the hero shot.</p>
+    <div class="chips"><span class="chip">3 SCENES</span><span class="chip">1 HERO SHOT</span><span class="chip">SELFIE OPTIONAL</span></div>
+    <div class="push"><button class="btn" type="button" id="startBtn">Action!</button></div>
+  </section>
+
+  <!-- Q1: scene of the day -->
+  <section class="screen" id="s-q1" hidden>
+    <span class="slate">Scene 1 · Your day</span>
+    <h2>Aaj ka din kaunsa scene tha?</h2>
+    <p class="english">Your day today was which scene? Swipe the reel and tap yours.</p>
+    <div class="track" id="track" role="group" aria-label="Scenes">
+      <button class="frame" type="button" data-mood="climax" aria-pressed="false">
+        <span class="still"><svg viewBox="0 0 200 150" aria-hidden="true" class="doodle">
+          <path d="M100 14l14 30 32-10-14 30 32 14-32 12 12 32-30-14-14 30-14-30-30 14 12-32-32-12 32-14-14-30 32 10z" fill="var(--yellow)" stroke="var(--ink)" stroke-width="3.2" stroke-linejoin="round"></path>
+          <text x="100" y="86" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="20" fill="var(--magenta)">DHISHOOM</text>
+          <path class="stroke" d="M24 30l14 8M20 60h16M176 30l-14 8M180 60h-16"></path>
+        </svg></span>
+        <b>Climax fight scene</b><span>Everything happened at once.</span><span class="pick">TAP IF THIS WAS YOUR DAY</span>
+      </button>
+      <button class="frame" type="button" data-mood="song" aria-pressed="false">
+        <span class="still"><svg viewBox="0 0 200 150" aria-hidden="true" class="doodle">
+          <path d="M50 70c0-30 22-50 50-50s50 20 50 50z" fill="var(--magenta)" stroke="var(--ink)" stroke-width="3.2"></path>
+          <path class="stroke" d="M50 70c8-8 17-8 25 0 8-8 17-8 25 0 8-8 17-8 25 0 8-8 17-8 25 0M100 70v52c0 8-12 8-12 0"></path>
+          <path class="stroke" d="M30 26l-4 10M44 10l-4 10M160 16l-4 10M176 40l-4 10M26 96l-4 10M170 96l-4 10"></path>
+          <path class="stroke" d="M150 110v-22l16-4v22"></path><circle cx="146" cy="112" r="5" fill="var(--ink)"></circle><circle cx="162" cy="108" r="5" fill="var(--ink)"></circle>
+        </svg></span>
+        <b>Rain song</b><span>Light, happy, a little filmy.</span><span class="pick">TAP IF THIS WAS YOUR DAY</span>
+      </button>
+      <button class="frame" type="button" data-mood="slowmo" aria-pressed="false">
+        <span class="still"><svg viewBox="0 0 200 150" aria-hidden="true" class="doodle">
+          <path d="M150 30c-14 0-20 12-14 22-12-2-18 12-8 20-10 6-4 22 10 18 4 12 22 10 22-2 12 4 20-10 12-18 10-8 2-22-10-20 4-12-4-20-12-20z" fill="var(--orange)" stroke="var(--ink)" stroke-width="3"></path>
+          <circle cx="72" cy="40" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="3.2"></circle>
+          <path d="M60 38h24v6H60z" fill="var(--ink)"></path>
+          <path class="stroke" d="M72 52v40M72 64l-16 16M72 64l18 10M72 92l-14 34M72 92l16 32"></path>
+          <path class="stroke" d="M20 70h20M14 86h22M22 102h16"></path>
+        </svg></span>
+        <b>Slow-motion walk away</b><span>Done for the day. Not looking back.</span><span class="pick">TAP IF THIS WAS YOUR DAY</span>
+      </button>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+    <div class="push"><button class="btn" type="button" id="q1Next" disabled>Next scene</button></div>
+  </section>
+
+  <!-- Q2: interval snack -->
+  <section class="screen" id="s-q2" hidden>
+    <span class="slate">Scene 2 · Interval</span>
+    <h2>Interval lo mee chethilo emundi?</h2>
+    <p class="english">It’s the interval. What’s in your hand?</p>
+    <div class="seat-wrap">
+      <svg viewBox="0 0 300 220" role="img" aria-label="Your theatre seat" id="seatSvg" class="doodle">
+        <path d="M70 70c0-30 20-44 80-44s80 14 80 44v70H70z" fill="var(--seat)" stroke="var(--ink)" stroke-width="3.2"></path>
+        <path d="M54 140h192v30H54z" fill="#8C0F2B" stroke="var(--ink)" stroke-width="3.2"></path>
+        <path d="M40 110h30v80H40zM230 110h30v80h-30z" fill="var(--ink)"></path>
+        <path d="M86 170v30M214 170v30" stroke="var(--ink)" stroke-width="8" stroke-linecap="round"></path>
+        <text x="150" y="110" text-anchor="middle" font-family="Courier Prime, monospace" font-weight="700" font-size="16" fill="var(--paper)">ROW F · SEAT 7</text>
+        <g id="snackShow"></g>
+      </svg>
+    </div>
+    <div class="snacks" role="group" aria-label="Interval snack">
+      <button class="snack" type="button" data-persona="classic" aria-pressed="false">
+        <svg viewBox="0 0 50 50" aria-hidden="true" class="doodle"><path d="M6 38L20 12l14 26z" fill="var(--orange)" stroke="currentColor" stroke-width="3"></path><path d="M32 22h12v18c0 4-3 6-6 6s-6-2-6-6z" fill="var(--paper)" stroke="currentColor" stroke-width="3"></path><path class="stroke" d="M36 16c-2-3 2-4 0-7"></path></svg>
+        Samosa and chai
+      </button>
+      <button class="snack" type="button" data-persona="romcom" aria-pressed="false">
+        <svg viewBox="0 0 50 50" aria-hidden="true" class="doodle"><path d="M12 18h26l-4 28H16z" fill="var(--magenta)" stroke="currentColor" stroke-width="3"></path><circle cx="16" cy="14" r="5" fill="var(--paper)" stroke="currentColor" stroke-width="2.5"></circle><circle cx="25" cy="10" r="5" fill="var(--paper)" stroke="currentColor" stroke-width="2.5"></circle><circle cx="34" cy="14" r="5" fill="var(--paper)" stroke="currentColor" stroke-width="2.5"></circle></svg>
+        Caramel popcorn
+      </button>
+      <button class="snack" type="button" data-persona="fdfs" aria-pressed="false">
+        <svg viewBox="0 0 50 50" aria-hidden="true" class="doodle"><path d="M6 16h38v6a4 4 0 0 0 0 8v6H6v-6a4 4 0 0 0 0-8z" fill="var(--yellow)" stroke="currentColor" stroke-width="3"></path><path d="M30 16v20" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 3"></path></svg>
+        Nothing. Not leaving my seat.
+      </button>
+      <button class="snack" type="button" data-persona="mass" aria-pressed="false">
+        <svg viewBox="0 0 50 50" aria-hidden="true" class="doodle"><path d="M4 34h42l-4 8H8z" fill="var(--cyan)" stroke="currentColor" stroke-width="3"></path><path d="M8 34l6-16 6 16M22 34v-12h8v12M34 34l4-14 4 14" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"></path></svg>
+        Snacks for the whole row
+      </button>
+    </div>
+    <div class="push"><button class="btn" type="button" id="q2Next" disabled>Next scene</button></div>
+  </section>
+
+  <!-- Q3: bill dialogue -->
+  <section class="screen" id="s-q3" hidden>
+    <span class="slate">Scene 3 · The bill</span>
+    <h2>Bill bandaaga, nimma dialogue enu?</h2>
+    <p class="english">When the bill comes, what’s your dialogue?</p>
+    <div class="screenbox" aria-live="polite">
+      <span class="curtain l" aria-hidden="true"></span><span class="curtain r" aria-hidden="true"></span>
+      <div class="scene-doodle" aria-hidden="true"><svg viewBox="0 0 200 100" class="doodle"><rect class="stroke" x="40" y="30" width="120" height="60" rx="6"></rect><path class="stroke" d="M60 50h80M60 64h50"></path><text x="100" y="22" text-anchor="middle" font-family="Courier Prime, monospace" font-weight="700" font-size="14" fill="currentColor">THE BILL</text></svg></div>
+      <p class="subtitle" id="subtitle">Pick your line below<small>It plays on screen like a subtitle</small></p>
+    </div>
+    <div class="lines" role="group" aria-label="Dialogue">
+      <button class="line" type="button" data-line="d1" aria-pressed="false"><span>“Bill main doonga. Aaj mera din hai.”</span><em>HINDI</em></button>
+      <button class="line" type="button" data-line="d2" aria-pressed="false"><span>“Bill aa? Next scene lo choosukundaam.”</span><em>TELUGU</em></button>
+      <button class="line" type="button" data-line="d3" aria-pressed="false"><span>“Swalpa adjust maadi, split maadona.”</span><em>KANNADA</em></button>
+      <button class="line" type="button" data-line="d4" aria-pressed="false"><span>“First selfie. Then bill. Then dessert.”</span><em>ENGLISH</em></button>
+    </div>
+    <div class="push"><button class="btn" type="button" id="q3Next" disabled>Hero shot</button></div>
+  </section>
+
+  <!-- Hero shot -->
+  <section class="screen" id="s-seal" hidden>
+    <span class="slate">The hero shot</span>
+    <h2>Hero entry ki ready aa?</h2>
+    <p class="english">Ready for your hero entry? Smile on ACTION.</p>
+    <div class="stage">
+      <div class="face" id="faceBox" hidden><video id="cam" playsinline muted></video><img id="faceImg" alt="Your hero shot" hidden></div>
+      <svg class="board doodle" viewBox="0 0 300 260" aria-hidden="true">
+        <g id="clapTop">
+          <path d="M34 112l232-40 6 34-232 40z" fill="var(--yellow)"></path>
+          <path d="M64 108l20 30M114 99l20 30M164 90l20 30M214 82l20 30" stroke="var(--ink)" stroke-width="12"></path>
+          <path class="stroke" d="M34 112l232-40 6 34-232 40z"></path>
+        </g>
+        <rect x="34" y="146" width="238" height="104" fill="var(--paper)"></rect>
+        <path d="M34 146h238v30H34z" fill="var(--yellow)"></path>
+        <path d="M64 146l18 30M114 146l18 30M164 146l18 30M214 146l18 30" stroke="var(--ink)" stroke-width="12"></path>
+        <rect x="34" y="146" width="238" height="104" fill="none" stroke="var(--paper)" stroke-width="3.2"></rect>
+        <text x="50" y="206" font-family="Courier Prime, monospace" font-weight="700" font-size="16" fill="var(--ink)">BAGARA TALKIES</text>
+        <text x="50" y="232" font-family="Courier Prime, monospace" font-weight="700" font-size="16" fill="var(--ink)">SCENE: HERO ENTRY</text>
+      </svg>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+    <div class="push">
+      <button class="btn alt" type="button" id="selfieBtn">Take my hero shot</button>
+      <input type="file" id="selfie" accept="image/*" capture="user" class="vh">
+      <label for="selfie" class="btn alt" id="fileBtn" hidden>Use my camera app instead</label>
+      <button class="btn ghost" type="button" id="noPhoto">No photo, keep the mystery</button>
+      <p class="note" id="camNote">Your camera opens right here. The screen flashes white to light your face. In this test, the photo stays on your phone.</p>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section class="screen" id="s-form" hidden>
+    <span class="slate">Your poster is ready</span>
+    <div class="preview"><img id="previewImg" alt="Top half of your poster"><span class="preview-tag">FULL POSTER ARRIVES ON WHATSAPP</span></div>
+    <h2>Poster ekkada pampali?</h2>
+    <p class="english">Where should we send your poster?</p>
+    <form id="sendForm" novalidate style="display:flex; flex-direction:column; gap:14px">
+      <div class="field"><label for="fname">First name (goes on the poster)</label><input id="fname" autocomplete="given-name" maxlength="16" placeholder="Arjun"></div>
+      <div class="field"><label for="phone">WhatsApp number</label><div class="phone-row"><span>+91</span><input id="phone" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="98765 43210"></div></div>
+      <label class="check" for="optin"><input type="checkbox" id="optin"><span>Also send me Bagara news and offers. Optional.</span></label>
+      <div class="err" id="err" aria-live="polite"></div>
+      <p class="banner">TEST VERSION: nothing you type here is saved or sent. In the real app this sends your poster on WhatsApp.</p>
+      <button class="btn" type="submit">Release my poster</button>
+      <button class="link" type="button" id="skipForm">Skip and show my poster</button>
+    </form>
+  </section>
+
+  <!-- Poster -->
+  <section class="screen" id="s-card" hidden>
+    <span class="slate" id="cardEyebrow">Now showing</span>
+    <div class="card-wrap"><img id="cardImg" alt="Your Bagara Talkies poster"></div>
+    <div class="row">
+      <button class="btn alt" type="button" id="shareBtn">Share poster</button>
+      <button class="btn ghost" type="button" id="saveBtn">Save</button>
+    </div>
+    <button class="link" type="button" id="againBtn">Play again</button>
+    <p class="toast" id="toast" aria-live="polite"></p>
+    <div class="sequel">
+      <svg viewBox="0 0 60 60" aria-hidden="true" class="doodle"><circle cx="30" cy="30" r="26" fill="var(--ink)"></circle><circle cx="30" cy="30" r="6" fill="var(--yellow)"></circle><circle cx="30" cy="14" r="5" fill="var(--yellow)"></circle><circle cx="30" cy="46" r="5" fill="var(--yellow)"></circle><circle cx="14" cy="30" r="5" fill="var(--yellow)"></circle><circle cx="46" cy="30" r="5" fill="var(--yellow)"></circle></svg>
+      <div><b>Agla scene, next visit mein</b><p class="teaser" id="teaser"></p></div>
+    </div>
+    <div class="filmo">
+      <span class="slate">Your filmography</span>
+      <div class="filmo-row" id="filmoRow"></div>
+      <p class="english">Every visit releases a new poster. Part 2 shows how your mood changed.</p>
+    </div>
+  </section>
+</div>
+
+<div class="flash" id="flash" aria-hidden="true"></div>
+<canvas id="cardCanvas" width="1080" height="1350" hidden></canvas>
+
+<script>
+(function () {
+  "use strict";
+  var MOODS = {
+    climax: { tag: "CLIMAX MODE", scene: "CLIMAX FIGHT" },
+    song: { tag: "SONG MODE", scene: "RAIN SONG" },
+    slowmo: { tag: "SLOW-MO MODE", scene: "SLOW-MO WALK AWAY" }
+  };
+  var PERSONAS = {
+    classic: { name: "The Evergreen Classic", line: "Samosa, chai, same seat since 2009. Never goes out of style.", snack: "SAMOSA AND CHAI", fortune: "Within 30 days, an old favourite surprises you all over again.", bg: "#C8175D", fg: "#FFF6E8", accent: "#FFD400", ray: "#B0124F" },
+    romcom: { name: "The Rom-Com Lead", line: "Caramel popcorn, happy ending, always shares the armrest.", snack: "CARAMEL POPCORN", fortune: "Within 30 days, a small plan turns into the best scene of the month.", bg: "#6A1FB0", fg: "#FFF6E8", accent: "#FF7A1A", ray: "#5A1798" },
+    fdfs: { name: "The First-Day-First-Show Fan", line: "Doesn’t leave the seat. Doesn’t miss a frame.", snack: "NOTHING. NOT LEAVING THE SEAT", fortune: "Within 30 days, you’ll be the first to hear something big.", bg: "#2135E0", fg: "#FFD400", accent: "#33D6E8", ray: "#1A2BC4" },
+    mass: { name: "The Mass Hero", line: "Bought snacks for the whole row. Whistles welcome.", snack: "SNACKS FOR THE WHOLE ROW", fortune: "Within 30 days, you’ll lead a plan and it’ll be a superhit.", bg: "#FFD400", fg: "#15101C", accent: "#C8175D", ray: "#FFC400" }
+  };
+  var LINES = {
+    d1: { text: "Bill main doonga. Aaj mera din hai.", en: "I’ll pay. Today is my day." },
+    d2: { text: "Bill aa? Next scene lo choosukundaam.", en: "The bill? We’ll handle it next scene." },
+    d3: { text: "Swalpa adjust maadi, split maadona.", en: "Adjust a little, let’s split it." },
+    d4: { text: "First selfie. Then bill. Then dessert.", en: "" }
+  };
+  var SNACK_ART = {
+    classic: '<g class="snack-pop"><path d="M118 96l22-40 22 40z" fill="#FF7A1A" stroke="#15101C" stroke-width="3"></path><path d="M168 70h20v28c0 6-4 9-10 9s-10-3-10-9z" fill="#FFF6E8" stroke="#15101C" stroke-width="3"></path></g>',
+    romcom: '<g class="snack-pop"><path d="M130 64h40l-6 40h-28z" fill="#C8175D" stroke="#15101C" stroke-width="3"></path><circle cx="136" cy="58" r="8" fill="#FFF6E8" stroke="#15101C" stroke-width="2.5"></circle><circle cx="150" cy="52" r="8" fill="#FFF6E8" stroke="#15101C" stroke-width="2.5"></circle><circle cx="164" cy="58" r="8" fill="#FFF6E8" stroke="#15101C" stroke-width="2.5"></circle></g>',
+    fdfs: '<g class="snack-pop"><path d="M112 66h76v10a7 7 0 0 0 0 14v10h-76V90a7 7 0 0 0 0-14z" fill="#FFD400" stroke="#15101C" stroke-width="3"></path><text x="150" y="89" text-anchor="middle" font-family="Courier Prime, monospace" font-weight="700" font-size="11" fill="#15101C">ADMIT ONE</text></g>',
+    mass: '<g class="snack-pop"><path d="M100 96h100l-8 12h-84z" fill="#33D6E8" stroke="#15101C" stroke-width="3"></path><path d="M110 96l8-24 8 24M134 96V76h12v20M156 96l6-22 6 22M176 96V80h10v16" fill="#FFF6E8" stroke="#15101C" stroke-width="3" stroke-linejoin="round"></path></g>'
+  };
+  var STEPS = { welcome: "Bagara Talkies", q1: "Scene 1 of 3", q2: "Scene 2 of 3", q3: "Scene 3 of 3", seal: "Hero shot", form: "Almost released", card: "Now showing" };
+  var state = { mood: null, persona: null, line: null, photo: null, photoUrl: null, name: "" };
+  var $ = function (id) { return document.getElementById(id); };
+  var all = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function refreshReel() { var done = [state.mood, state.persona, state.line]; all("#reel i").forEach(function (el, i) { el.classList.toggle("on", !!done[i]); }); }
+  function show(name) {
+    ["welcome", "q1", "q2", "q3", "seal", "form", "card"].forEach(function (n) { $("s-" + n).hidden = n !== name; });
+    document.body.setAttribute("data-screen", name); $("stepLabel").textContent = STEPS[name]; window.scrollTo(0, 0);
+  }
+  if (!reduce) { var seed = 2, noise = $("wobNoise"); setInterval(function () { seed = seed % 4 + 1; noise.setAttribute("seed", String(seed)); }, 170); }
+
+  /* sound */
+  var ac = null;
+  function audio() {
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } }
+    if (ac && ac.state === "suspended") { ac.resume().catch(function () {}); }
+    return ac;
+  }
+  function noiseSrc(a, dur) { var len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0); for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; var s = a.createBufferSource(); s.buffer = buf; return s; }
+  function playSound(kind) {
+    var a = audio(); if (!a) return;
+    var t = a.currentTime, out = a.createGain(); out.gain.value = 0.9; out.connect(a.destination);
+    if (kind === "climax") {
+      for (var h = 0; h < 2; h++) {
+        var ht = t + h * 0.32, o = a.createOscillator(), g = a.createGain();
+        o.type = "sine"; o.frequency.setValueAtTime(160, ht); o.frequency.exponentialRampToValueAtTime(45, ht + 0.25);
+        g.gain.setValueAtTime(0.9, ht); g.gain.exponentialRampToValueAtTime(0.001, ht + 0.3);
+        o.connect(g); g.connect(out); o.start(ht); o.stop(ht + 0.32);
+        var n = noiseSrc(a, 0.08), ng = a.createGain(); ng.gain.setValueAtTime(0.6, ht); ng.gain.exponentialRampToValueAtTime(0.001, ht + 0.08); n.connect(ng); ng.connect(out); n.start(ht);
+      }
+    } else if (kind === "song") {
+      var rn = noiseSrc(a, 1.6), lp = a.createBiquadFilter(), rg = a.createGain();
+      lp.type = "bandpass"; lp.frequency.value = 5000; lp.Q.value = 0.6;
+      rg.gain.setValueAtTime(0, t); rg.gain.linearRampToValueAtTime(0.25, t + 0.3); rg.gain.linearRampToValueAtTime(0, t + 1.6);
+      rn.connect(lp); lp.connect(rg); rg.connect(out); rn.start(t);
+      [523, 659, 784].forEach(function (f, i) {
+        var mo = a.createOscillator(), mg = a.createGain(), mt = t + 0.2 + i * 0.28;
+        mo.type = "triangle"; mo.frequency.value = f; mg.gain.setValueAtTime(0, mt); mg.gain.linearRampToValueAtTime(0.18, mt + 0.03); mg.gain.exponentialRampToValueAtTime(0.001, mt + 0.4);
+        mo.connect(mg); mg.connect(out); mo.start(mt); mo.stop(mt + 0.45);
+      });
+    } else if (kind === "slowmo") {
+      var wn = noiseSrc(a, 1.4), bp = a.createBiquadFilter(), wg = a.createGain();
+      bp.type = "bandpass"; bp.Q.value = 1.5; bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(2400, t + 1.2);
+      wg.gain.setValueAtTime(0, t); wg.gain.linearRampToValueAtTime(0.5, t + 0.5); wg.gain.linearRampToValueAtTime(0, t + 1.4);
+      wn.connect(bp); bp.connect(wg); wg.connect(out); wn.start(t);
+    } else if (kind === "clap") {
+      var cn = noiseSrc(a, 0.12), cf = a.createBiquadFilter(), cg = a.createGain();
+      cf.type = "bandpass"; cf.frequency.value = 1500; cf.Q.value = 0.8; cg.gain.setValueAtTime(0.9, t); cg.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      cn.connect(cf); cf.connect(cg); cg.connect(out); cn.start(t);
+    } else if (kind === "pop") {
+      var po = a.createOscillator(), pg = a.createGain(); po.type = "sine"; po.frequency.setValueAtTime(420, t); po.frequency.exponentialRampToValueAtTime(900, t + 0.08);
+      pg.gain.setValueAtTime(0.3, t); pg.gain.exponentialRampToValueAtTime(0.001, t + 0.12); po.connect(pg); pg.connect(out); po.start(t); po.stop(t + 0.13);
+    }
+  }
+
+  /* Q1 reel */
+  var track = $("track");
+  track.addEventListener("scroll", function () {
+    var frames = all(".frame"), mid = track.scrollLeft + track.clientWidth / 2, best = 0, bestD = 1e9;
+    frames.forEach(function (f, i) { var d = Math.abs(f.offsetLeft + f.offsetWidth / 2 - mid); if (d < bestD) { bestD = d; best = i; } });
+    all("#dots i").forEach(function (d, i) { d.classList.toggle("on", i === best); });
+  }, { passive: true });
+  all(".frame").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.mood = btn.getAttribute("data-mood");
+      all(".frame").forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); b.classList.remove("playing"); b.querySelector(".pick").textContent = b === btn ? "THIS WAS MY DAY" : "TAP IF THIS WAS YOUR DAY"; });
+      btn.classList.add("playing"); setTimeout(function () { btn.classList.remove("playing"); }, 1200);
+      if (btn.scrollIntoView) btn.scrollIntoView({ behavior: reduce ? "auto" : "smooth", inline: "center", block: "nearest" });
+      playSound(state.mood); refreshReel(); $("q1Next").disabled = false;
+    });
+  });
+
+  /* Q2 snack */
+  all(".snack").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.persona = btn.getAttribute("data-persona");
+      all(".snack").forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+      $("snackShow").innerHTML = SNACK_ART[state.persona];
+      $("seatSvg").setAttribute("aria-label", "Your theatre seat with " + PERSONAS[state.persona].snack.toLowerCase());
+      playSound("pop"); refreshReel(); $("q2Next").disabled = false;
+    });
+  });
+
+  /* Q3 dialogue */
+  var typeTimer = null;
+  all(".line").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.line = btn.getAttribute("data-line");
+      all(".line").forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+      var L = LINES[state.line], sub = $("subtitle"), i = 0;
+      if (typeTimer) clearInterval(typeTimer);
+      var finish = function () { sub.textContent = "“" + L.text + "”"; if (L.en) { var sm = document.createElement("small"); sm.textContent = L.en; sub.appendChild(sm); } };
+      if (reduce) finish();
+      else { sub.textContent = ""; typeTimer = setInterval(function () { i++; sub.textContent = "“" + L.text.slice(0, i); if (i >= L.text.length) { clearInterval(typeTimer); typeTimer = null; finish(); } }, 28); }
+      playSound("clap"); refreshReel(); $("q3Next").disabled = false;
+    });
+  });
+
+  /* hero shot */
+  var stream = null;
+  function stopCam() { if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } $("cam").srcObject = null; }
+  function runShot(onAction, showFace) {
+    $("selfieBtn").hidden = true; $("fileBtn").hidden = true; $("noPhoto").hidden = true;
+    var seq = ["3", "2", "1", "ACTION!"], i = 0, step = reduce ? 250 : 750, top = $("clapTop"), count = $("count");
+    function tick() {
+      count.textContent = seq[i];
+      if (i === 2 && onAction) { setTimeout(function () { $("flash").classList.add("on"); }, step - 160); }
+      if (i === 3) {
+        top.classList.add("shut"); playSound("clap"); setTimeout(function () { top.classList.remove("shut"); }, 220);
+        var got = onAction ? onAction() : false;
+        if (got || showFace) { $("faceBox").hidden = false; requestAnimationFrame(function () { $("faceBox").classList.add("show"); }); }
+        setTimeout(function () { count.textContent = ""; goForm(); }, (got || showFace) ? step * 2.4 : step * 1.4);
+        return;
+      }
+      i++; setTimeout(tick, step);
+    }
+    tick();
+  }
+  function capture() {
+    var v = $("cam"), w = v.videoWidth, h = v.videoHeight;
+    if (!w || !h) { stopCam(); $("flash").classList.remove("on"); return false; }
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var x = c.getContext("2d"); x.translate(w, 0); x.scale(-1, 1); x.drawImage(v, 0, 0, w, h);
+    stopCam(); $("flash").classList.remove("on");
+    state.photo = c; $("faceImg").src = c.toDataURL("image/jpeg", 0.85); $("faceImg").hidden = false; $("cam").hidden = true;
+    return true;
+  }
+  function camFail() {
+    stopCam(); $("selfieBtn").hidden = true; $("fileBtn").hidden = false; $("noPhoto").hidden = false;
+    $("camNote").textContent = "The camera didn’t open on this page. Use your camera app instead, or skip the photo.";
+  }
+  $("selfieBtn").addEventListener("click", function () {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFail(); return; }
+    $("selfieBtn").disabled = true;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 960 }, height: { ideal: 960 } }, audio: false })
+      .then(function (st) {
+        stream = st; var v = $("cam"); v.hidden = false; v.srcObject = st;
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+        $("faceImg").hidden = true; $("faceBox").hidden = false; requestAnimationFrame(function () { $("faceBox").classList.add("show"); });
+        setTimeout(function () { runShot(capture, false); }, 600);
+      })
+      .catch(function () { $("selfieBtn").disabled = false; camFail(); });
+  });
+  $("selfie").addEventListener("change", function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    if (state.photoUrl) URL.revokeObjectURL(state.photoUrl);
+    state.photoUrl = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function () { state.photo = img; $("faceImg").src = state.photoUrl; $("faceImg").hidden = false; $("cam").hidden = true; runShot(null, true); };
+    img.onerror = function () { state.photo = null; runShot(null, false); };
+    img.src = state.photoUrl;
+  });
+  $("noPhoto").addEventListener("click", function () { stopCam(); state.photo = null; runShot(null, false); });
+
+  /* poster */
+  function wrapLines(ctx, text, maxW) {
+    var words = text.split(" "), lines = [], cur = "";
+    words.forEach(function (w) { var t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+    if (cur) lines.push(cur); return lines;
+  }
+  function halftone(ctx, img, cx, cy, r, bg, fg) {
+    var step = 10, n = Math.ceil(2 * r / step), off = document.createElement("canvas"); off.width = n; off.height = n;
+    var o = off.getContext("2d"), iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height, s = Math.min(iw, ih);
+    o.drawImage(img, (iw - s) / 2, (ih - s) / 2 * 0.7, s, s, 0, 0, n, n);
+    var d = o.getImageData(0, 0, n, n).data, lum = [], i;
+    for (i = 0; i < n * n; i++) lum.push(0.2126 * d[i * 4] + 0.7152 * d[i * 4 + 1] + 0.0722 * d[i * 4 + 2]);
+    var sorted = lum.slice().sort(function (a, b) { return a - b; }), lo = sorted[Math.floor(sorted.length * 0.05)], hi = sorted[Math.floor(sorted.length * 0.95)] || 255;
+    if (hi - lo < 20) hi = lo + 20;
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+    ctx.fillStyle = bg; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r); ctx.fillStyle = fg;
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      var v = Math.max(0, Math.min(1, (lum[y * n + x] - lo) / (hi - lo))), rad = step * 0.62 * Math.sqrt(v);
+      if (rad > 0.6) { ctx.beginPath(); ctx.arc(cx - r + (x + 0.5) * step, cy - r + (y + 0.5) * step, rad, 0, Math.PI * 2); ctx.fill(); }
+    }
+    ctx.restore();
+  }
+  function rays(ctx, cx, cy, color) {
+    ctx.fillStyle = color;
+    for (var k = 0; k < 18; k++) { var a0 = k * Math.PI / 9, a1 = a0 + Math.PI / 18; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a0) * 1400, cy + Math.sin(a0) * 1400); ctx.lineTo(cx + Math.cos(a1) * 1400, cy + Math.sin(a1) * 1400); ctx.closePath(); ctx.fill(); }
+  }
+  function drawPoster(withName) {
+    var c = $("cardCanvas"), ctx = c.getContext("2d"), W = 1080, H = 1350;
+    var P = PERSONAS[state.persona || "classic"], M = MOODS[state.mood || "climax"], L = LINES[state.line || "d4"];
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    rays(ctx, 540, 400, P.ray);
+    ctx.globalAlpha = 0.07; ctx.fillStyle = P.fg; for (var g = 0; g < 2400; g++) ctx.fillRect(Math.random() * W, Math.random() * H, 2, 2); ctx.globalAlpha = 1;
+    ctx.fillStyle = P.fg; ctx.font = "700 30px 'Courier Prime', monospace"; ctx.textAlign = "left"; ctx.fillText("BAGARA TALKIES PRESENTS", 64, 96);
+    ctx.save(); ctx.translate(890, 150); ctx.rotate(-0.12);
+    ctx.font = "400 26px Bungee, sans-serif"; var tw = ctx.measureText(M.tag).width;
+    ctx.fillStyle = P.accent; ctx.fillRect(-tw / 2 - 20 + 6, -24, tw + 40, 54);
+    ctx.fillStyle = P.fg; ctx.fillRect(-tw / 2 - 20, -30, tw + 40, 54);
+    ctx.fillStyle = P.bg; ctx.textAlign = "center"; ctx.fillText(M.tag, 0, 7); ctx.restore();
+    var cx = 540, cy = 400, r = 206;
+    ctx.fillStyle = P.accent; ctx.beginPath(); ctx.arc(cx + 12, cy + 12, r + 16, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = P.fg; ctx.beginPath(); ctx.arc(cx, cy, r + 16, 0, Math.PI * 2); ctx.fill();
+    if (state.photo) {
+      var light = P.fg === "#15101C";
+      halftone(ctx, state.photo, cx, cy, r, light ? "#15101C" : P.ray, light ? "#FFD400" : P.fg);
+    } else {
+      ctx.fillStyle = P.bg; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = P.fg; ctx.font = "400 200px Bungee, sans-serif"; ctx.textAlign = "center"; ctx.fillText("?", cx, cy + 40);
+      ctx.font = "700 26px 'Courier Prime', monospace"; ctx.fillText("FACE REVEAL IN PART 2", cx, cy + 96);
+    }
+    /* subtitle bar */
+    ctx.textAlign = "center"; ctx.font = "800 38px Archivo, sans-serif";
+    var q = "“" + L.text + "”", subLines = wrapLines(ctx, q, 900).slice(0, 2), barH = 26 + subLines.length * 46, barY = 560;
+    ctx.fillStyle = "rgba(0,0,0,.82)"; ctx.fillRect(70, barY, 940, barH);
+    ctx.fillStyle = "#FFD400"; subLines.forEach(function (ln, i) { ctx.fillText(ln, 540, barY + 52 + i * 46); });
+    var y = barY + barH + 56;
+    ctx.fillStyle = P.fg; ctx.font = "700 32px 'Courier Prime', monospace";
+    ctx.fillText(withName && state.name ? "STARRING " + state.name.toUpperCase() : "STARRING YOU", 540, y);
+    var size = 100, title = P.name.toUpperCase(); ctx.font = "400 " + size + "px Bungee, sans-serif";
+    while (ctx.measureText(title).width > 960 && size > 72) { size -= 4; ctx.font = "400 " + size + "px Bungee, sans-serif"; }
+    var widest = function () { return Math.max.apply(null, title.split(" ").map(function (w) { return ctx.measureText(w).width; })); };
+    while (ctx.measureText(title).width > 960 && widest() > 960 && size > 48) { size -= 4; ctx.font = "400 " + size + "px Bungee, sans-serif"; }
+    var tl = ctx.measureText(title).width > 960 ? wrapLines(ctx, title, 960) : [title];
+    y += 20 + size * 0.86;
+    ctx.save(); ctx.translate(540, 0); ctx.rotate(-0.035);
+    tl.forEach(function (ln) { ctx.fillStyle = P.accent; ctx.fillText(ln, 8, y + 8); ctx.fillStyle = P.fg; ctx.fillText(ln, 0, y); y += size * 0.98; });
+    ctx.restore();
+    y += 6; ctx.font = "500 32px Archivo, sans-serif"; ctx.fillStyle = P.fg;
+    var room = Math.max(1, Math.floor((1150 - y) / 40) + 1);
+    wrapLines(ctx, P.line, 920).slice(0, Math.min(2, room)).forEach(function (ln) { ctx.fillText(ln, 540, y); y += 40; });
+    try { ctx.fontStretch = "condensed"; } catch (e) {}
+    ctx.font = "700 24px Archivo, sans-serif"; ctx.globalAlpha = 0.9;
+    ctx.fillText("SCENE OF THE DAY: " + M.scene, 540, 1184);
+    ctx.fillText("INTERVAL: " + P.snack, 540, 1214);
+    ctx.fillText("FOOD BY BAGARA BIRYANI CAFE", 540, 1244);
+    ctx.globalAlpha = 1; try { ctx.fontStretch = "normal"; } catch (e) {}
+    ctx.fillStyle = P.fg; ctx.fillRect(0, 1268, W, 82);
+    ctx.fillStyle = P.bg; ctx.font = "400 30px Bungee, sans-serif"; ctx.textAlign = "left"; ctx.fillText("PART 2: NEXT VISIT", 64, 1320);
+    ctx.font = "700 24px 'Courier Prime', monospace"; ctx.textAlign = "right";
+    ctx.fillText("NOW SHOWING · " + new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" }).toUpperCase(), W - 64, 1318);
+    ctx.textAlign = "left";
+    return new Promise(function (res) { c.toBlob(function (b) { res(b); }, "image/png"); });
+  }
+  var fontsReady = null;
+  function loadFonts() {
+    if (!fontsReady) fontsReady = Promise.all([document.fonts.load("100px Bungee"), document.fonts.load("700 30px 'Courier Prime'"), document.fonts.load("500 32px Archivo"), document.fonts.load("800 38px Archivo"), document.fonts.load("700 24px Archivo")]).catch(function () {});
+    return fontsReady;
+  }
+  var cardBlob = null, cardUrl = null;
+  function render(withName, imgEl) {
+    return loadFonts().then(function () { return drawPoster(withName); }).then(function (blob) {
+      cardBlob = blob; if (cardUrl) URL.revokeObjectURL(cardUrl); cardUrl = URL.createObjectURL(blob); imgEl.src = cardUrl; return cardUrl;
+    });
+  }
+  function goForm() { show("form"); render(false, $("previewImg")); }
+  function goCard() {
+    var P = PERSONAS[state.persona || "classic"];
+    $("teaser").textContent = P.fortune.split(" ").slice(0, 6).join(" ") + "… The rest releases on your next visit.";
+    $("cardEyebrow").textContent = state.name ? "Now showing: " + state.name : "Now showing";
+    show("card");
+    render(true, $("cardImg")).then(function (url) {
+      $("filmoRow").innerHTML = '<div><span class="poster on" style="background-image:url(' + url + ')" role="img" aria-label="Tonight’s poster"></span>TONIGHT</div>' +
+        ["PART 2", "PART 3", "PART 4", "PART 5"].map(function (l) { return '<div><span class="poster" aria-hidden="true"></span>' + l + '</div>'; }).join("");
+    });
+  }
+  $("sendForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var ph = $("phone").value.replace(/\D/g, "");
+    if (ph && ph.length !== 10) { $("err").textContent = "Enter a 10-digit mobile number, or skip."; return; }
+    $("err").textContent = ""; state.name = $("fname").value.trim().slice(0, 16); goCard();
+  });
+  $("skipForm").addEventListener("click", function () { state.name = $("fname").value.trim().slice(0, 16); goCard(); });
+
+  function posterFile() { return new File([cardBlob], "my-bagara-poster.png", { type: "image/png" }); }
+  function savePoster() {
+    var a = document.createElement("a"); a.href = cardUrl; a.download = "my-bagara-poster.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    $("toast").textContent = "Poster saved. On some phones, press and hold the poster to save it instead.";
+  }
+  $("shareBtn").addEventListener("click", function () {
+    if (!cardBlob) return;
+    var f = posterFile();
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      navigator.share({ files: [f], title: "My Bagara Talkies poster", text: "Starring me. Played at Bagara Biryani Cafe." })
+        .then(function () { $("toast").textContent = "Shared."; })
+        .catch(function (e) { if (!e || e.name !== "AbortError") savePoster(); });
+    } else savePoster();
+  });
+  $("saveBtn").addEventListener("click", function () { if (cardBlob) savePoster(); });
+
+  function reset() {
+    stopCam();
+    state = { mood: null, persona: null, line: null, photo: null, photoUrl: null, name: "" };
+    all("[aria-pressed]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+    all(".frame .pick").forEach(function (p) { p.textContent = "TAP IF THIS WAS YOUR DAY"; });
+    ["q1Next", "q2Next", "q3Next"].forEach(function (id) { $(id).disabled = true; });
+    $("snackShow").innerHTML = ""; $("subtitle").innerHTML = "Pick your line below<small>It plays on screen like a subtitle</small>";
+    $("selfie").value = ""; $("selfieBtn").hidden = false; $("selfieBtn").disabled = false; $("fileBtn").hidden = true; $("noPhoto").hidden = false;
+    $("camNote").textContent = "Your camera opens right here. The screen flashes white to light your face. In this test, the photo stays on your phone.";
+    $("faceBox").classList.remove("show"); $("faceBox").hidden = true; $("faceImg").hidden = true; $("cam").hidden = false;
+    $("fname").value = ""; $("phone").value = ""; $("optin").checked = false; $("toast").textContent = "";
+    refreshReel(); show("welcome");
+  }
+  $("againBtn").addEventListener("click", reset);
+  $("startBtn").addEventListener("click", function () { audio(); show("q1"); });
+  $("q1Next").addEventListener("click", function () { show("q2"); });
+  $("q2Next").addEventListener("click", function () { show("q3"); });
+  $("q3Next").addEventListener("click", function () { show("seal"); });
+  refreshReel(); show("welcome"); loadFonts();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add("ready"); }); });
+})();
+</script>
+</body>
+</html>
